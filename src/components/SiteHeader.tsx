@@ -34,7 +34,7 @@ export function SiteHeader() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-9 lg:flex">
+        <nav className="hidden items-center gap-8 xl:flex">
           {navLinks.map((l) =>
             "slug" in l ? (
               <Link
@@ -60,7 +60,7 @@ export function SiteHeader() {
           )}
         </nav>
 
-        <Link to="/contact" hash="enquire" className="btn-base btn-brass hidden lg:inline-flex">
+        <Link to="/contact" hash="enquire" className="btn-base btn-brass hidden xl:inline-flex">
           Book a Consult
         </Link>
 
@@ -69,14 +69,14 @@ export function SiteHeader() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open}
           onClick={() => setOpen((v) => !v)}
-          className="text-cream lg:hidden"
+          className="text-cream xl:hidden"
         >
           {open ? <X size={22} /> : <Menu size={22} />}
         </button>
       </div>
 
       {open && (
-        <div className="bg-background/98 border-t backdrop-blur-md lg:hidden">
+        <div className="bg-background/98 border-t backdrop-blur-md xl:hidden">
           <nav className="flex flex-col px-6 py-4">
             {navLinks.map((l) =>
               "slug" in l ? (
