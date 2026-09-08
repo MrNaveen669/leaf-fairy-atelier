@@ -1,0 +1,1 @@
+import {Router} from 'express';import {getCollectionBySlug,getCollections} from '../controllers/collections.js';const r=Router();r.get('/',getCollections);r.get('/:slug',getCollectionBySlug);export default r;
