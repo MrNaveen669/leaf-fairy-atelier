@@ -1,53 +1,92 @@
-# Leaf Fairy Luxe
+# Leaf Fairy Atelier — MERN Phase 1
 
-Build a luxury, premium single-page website for "Leaf Fairy" — a brand crafting premium artificial trees, plants, florals and luxury decor accessories, styled for homes, hotels and flagship interiors (based in Mumbai). This is a rebuild/rebrand of an earlier "LeafVelly" concept — reuse the same overall content strategy and structure, but elevate it to a fully polished, production-ready 10/10 site, not a placeholder demo.
+Phase 1 restructures the existing Leaf Fairy Atelier site from TypeScript + TanStack Start into a plain JavaScript MERN project while preserving the existing brochure/catalog experience.
 
-=== BRAND ===
-- Name: Leaf Fairy
-- Tagline: "Evergreen luxury, perfectly composed."
-- Tone: quiet, confident luxury — like a couture atelier, not a generic plant shop
-- Logo: elegant wordmark "Leaf Fairy" (serif or refined sans), no literal fairy clipart — keep it sophisticated
+## Stack
 
-=== KEY FIX vs the old demo ===
-- ALL "Explore" buttons under each collection must actually navigate to a real, fully built category page (not dead anchor links) — use client-side routing (React Router) with a page per collection: Statement Trees, Botanical Studies, Florals & Orchids, Decor Accessories. Each category page needs its own hero, a grid of realistic sample products (name, short description, image placeholder, indicative price range in INR), and a "Enquire about this piece" CTA that opens WhatsApp/contact.
-- Use a REAL placeholder contact number format clearly marked as [PHONE PLACEholder] in a way that's obvious it needs to be swapped (e.g. use a config file /src/config/contact.ts with a clearly named PLACEHOLDER_PHONE constant) so it's easy for the client to update — do not silently fabricate a real-looking business phone number as if it were verified.
-- Do NOT include unverifiable press/media logos (no "As seen in Architectural Digest / Elle Decor" etc.) unless the user later confirms real press mentions — replace that section with a genuine trust-building element instead, like certifications, guarantee badges, or a "by the numbers" stats bar.
-- Testimonials should be clearly fictional/sample placeholders in a code comment, structured so real ones can be swapped in easily.
+- **Client:** React + Vite + JavaScript/JSX + React Router + Tailwind + Framer Motion
+- **Server:** Node.js + Express + JavaScript
+- **Database:** MongoDB + Mongoose
+- **Validation:** Zod on both the contact form and the POST `/api/enquiries` API
 
-=== PAGES / SECTIONS ===
-1. Home: hero (large botanical image, tagline, dual CTA "View Collections" / "Book a Styling Consult"), trust stats bar, 4 collection cards linking to real category pages, portfolio/case-study grid (filterable: All/Residential/Hospitality/Commercial), process section (4 steps), testimonials (marked as sample), contact section with form + WhatsApp button
-2. Individual category pages (4) as described above
-3. Simple portfolio project detail (optional nice-to-have, can be a modal or page)
-4. Contact page/section with a working front-end form (no backend required, just client-side validation + a friendly submit confirmation state)
+There is no TypeScript, TanStack Start, TanStack Router, SSR, cart, checkout, orders, authentication, payments, or admin dashboard in this phase.
 
-=== VISUAL DIRECTION ===
-- Deep, elegant palette: charcoal/near-black backgrounds, warm brass/gold accents, cream text, rich botanical greens as secondary accent
-- Generous whitespace, refined serif display type for headings, clean sans-serif body
-- Subtle scroll reveal animations (Framer Motion), tasteful — not flashy
-- Fully responsive, mobile-first
-- Use elegant image placeholders (high-quality botanical/interior stock-style descriptions) with clear alt text since real photography isn't available yet
+## Structure
 
-Build this as a complete, polished, real product — not a demo shell. Every nav link and CTA should go somewhere real.
+```text
+client/   React/Vite SPA
+server/   Express REST API + Mongoose models + seed script
+```
 
-This project was built with [Lovable](https://lovable.dev).
+## Setup
 
-**Live app**: https://leaf-fairy-atelier.lovable.app
+1. Install dependencies:
 
-## Build with Lovable
+```bash
+npm install
+```
 
-Continue developing this project in the [Lovable editor](https://lovable.dev/projects/6371eb22-4017-4f52-91cc-15120d7c4743).
+The root `postinstall` script installs both `client` and `server` dependencies automatically.
 
-- **Ship faster**: describe what you want to build and Lovable handles the code.
-- **Stay in sync**: every change made in Lovable is committed straight to this repository.
-- **Full ownership**: this code is yours. Push to `main` on GitHub and your changes sync back into Lovable, ready for your next prompt.
+2. Create `server/.env` from `server/.env.example` and set `MONGODB_URI`.
 
-## Development
+```env
+MONGODB_URI=mongodb://127.0.0.1:27017/leaf-fairy-atelier
+PORT=5000
+CLIENT_URL=http://localhost:5173
+NODE_ENV=development
+```
 
-Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
+`JWT_SECRET` remains in `.env.example` only as a future-phase placeholder. Authentication is intentionally not implemented in Phase 1.
 
-```sh
-git clone <this-repository-url>
-cd <repository-name>
-npm i
+3. Seed MongoDB:
+
+```bash
+npm run seed
+```
+
+4. Start client and server together:
+
+```bash
 npm run dev
 ```
+
+Client: `http://localhost:5173`  
+API: `http://localhost:5000/api`
+
+## API
+
+- `GET /api/collections`
+- `GET /api/collections/:slug` (includes products)
+- `GET /api/products`
+- `GET /api/products/:id`
+- `GET /api/products?collection=:slug`
+- `GET /api/projects`
+- `GET /api/projects?category=Residential`
+- `GET /api/testimonials`
+- `POST /api/enquiries`
+
+## Contact form change
+
+The old site validated the enquiry form client-side and then discarded successful submissions. Phase 1 keeps the same interaction but now POSTs validated form data to `/api/enquiries`, where it is validated again and persisted in MongoDB.
+
+## Content and image migration
+
+Catalog, project, and testimonial copy is converted from the old `src/data/site.ts` into `server/seed/seed.js`. Product `priceRange` remains a display string; it is **not** a transactional price.
+
+The original image assets are referenced from their existing public GitHub raw paths in this Phase 1 migration. If you want the project fully self-contained later, copy the old JPG assets into `client/src/assets/` and replace the remote URLs with local imports.
+
+The existing stats, assurances, and process-step copy lives in `client/src/data/siteContent.js`. This is deliberate because Phase 1 only defines Collection, Product, Project, Testimonial, and Enquiry models.
+
+## Production
+
+```bash
+npm run build
+npm start
+```
+
+With `NODE_ENV=production`, Express serves `client/dist` in addition to `/api`.
+
+## Future phases
+
+Deferred intentionally: cart, checkout, orders, numeric sellable prices, stock/inventory, users/authentication, payments, wishlist, admin UI, catalog editing APIs, and other e-commerce behavior.
