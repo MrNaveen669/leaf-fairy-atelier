@@ -1,0 +1,2 @@
+export const PLACEHOLDER_PHONE='[PHONE PLACEHOLDER]';export const PLACEHOLDER_EMAIL='[EMAIL PLACEHOLDER]';export const PLACEHOLDER_ADDRESS='[MUMBAI STUDIO ADDRESS PLACEHOLDER]';export const WHATSAPP_NUMBER='919999999999'; // PLACEHOLDER ONLY — replace before launch.
+export function whatsappLink(message='Hello Leaf Fairy, I would like to enquire about a styling consultation.'){return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`}
