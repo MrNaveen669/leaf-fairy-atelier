@@ -9,6 +9,7 @@ import Testimonial from '../models/Testimonial.js';
 const A='https://raw.githubusercontent.com/MrNaveen669/leaf-fairy-atelier/main/src/assets';
 const img={hero:`${A}/hero.jpg`,trees:`${A}/col-trees.jpg`,botanical:`${A}/col-botanical.jpg`,florals:`${A}/col-florals.jpg`,decor:`${A}/col-decor.jpg`};
 
+// Faithful plain-JS conversion of the old src/data/site.ts catalog shapes.
 const collections=[
 {slug:'statement-trees',title:'Statement Trees',kicker:'Collection 01',summary:'Architectural artificial trees, hand-assembled leaf by leaf, scaled for double-height lobbies and living rooms.',heroLine:'Sculptural scale for rooms that deserve a centrepiece. Each tree is built on a real hardwood armature and finished to your ceiling height.',image:img.trees,alt:'Tall artificial olive tree in a matte black planter inside a dark, brass-accented luxury interior'},
 {slug:'botanical-studies',title:'Botanical Studies',kicker:'Collection 02',summary:'Table and console-scale greenery — ferns, philodendrons and trailing forms in considered vessels.',heroLine:'The quiet layer. Small-scale botanicals that finish a room the way a bracelet finishes a sleeve.',image:img.botanical,alt:'Three artificial potted plants — fern, philodendron and monstera — on a black stone console'},
@@ -55,5 +56,6 @@ const testimonials=[
 {quote:'They specified the planters to our veneer without being asked. That is the level of attention we hire for.',name:'Sample Client',role:'Principal, interior design practice',approved:true}
 ];
 
+// Marketing arrays from old site.ts remain in client/src/data/siteContent.js because Phase 1's requested DB model list has no SiteContent model.
 async function seed(){await connectDB();await Promise.all([Collection.deleteMany({}),Product.deleteMany({}),Project.deleteMany({}),Testimonial.deleteMany({})]);await Collection.insertMany(collections);await Product.insertMany(products);await Project.insertMany(projects);await Testimonial.insertMany(testimonials);console.log(`Seeded ${collections.length} collections, ${products.length} products, ${projects.length} projects, ${testimonials.length} testimonials.`);await mongoose.disconnect();}
 seed().catch(async err=>{console.error(err);await mongoose.disconnect();process.exit(1)});
