@@ -55,8 +55,8 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 
 ## Current Feature Status
 
-- Design system: PARTIAL — visual tokens and utility classes exist; no full component system.
-- Header/navigation: PARTIAL — responsive header and collection/contact links; no full commerce navigation.
+- Design system: PARTIAL — reusable palette tokens, typography, spacing, buttons, focus states, and motion preferences now exist; no full component system.
+- Header/navigation: PARTIAL — announcement bar, responsive sticky shell, collection/contact links, utility placeholders, and accessible mobile drawer exist; full commerce navigation is deferred.
 - Homepage: PARTIAL — hero, collections, projects, testimonials, and enquiry CTA exist.
 - PLP/catalog: PARTIAL — collection product grid exists; no full shop, sort, filters, or pagination.
 - PDP: MISSING.
@@ -70,7 +70,7 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 - Database: PARTIAL — MongoDB/Mongoose models for collections, products, projects, testimonials, and enquiries.
 - Admin: MISSING.
 - CMS: MISSING.
-- Responsive UX: PARTIAL — responsive layout and mobile menu exist; accessibility and edge states need work.
+- Responsive UX: PARTIAL — shell is responsive with touch-sized controls, scroll lock, Escape handling, focus states, and reduced-motion support; broader page accessibility and edge states need work.
 - SEO: MISSING — no route metadata, structured data, sitemap, or robots configuration.
 
 ## Known Issues
@@ -96,11 +96,18 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 
 ## Current Milestone
 
-`Phase 0 — Stabilized`
+`Phase 1.1 — Frontend Foundation & Global Luxury Shell — DONE`
 
 ## Next Milestone
 
-`Phase 1.1 — Frontend foundation and global luxury shell`
+`Phase 1.2 — Luxury Homepage`
+
+## Phase 1.1 Notes
+
+- Refined `styles.css` and Tailwind tokens around the specified forest, ivory, parchment, sage, clay, and restrained antique-gold palette.
+- Refined `SiteHeader.jsx` with announcement bar, hero/solid modes, utility placeholders, responsive navigation, body scroll lock, Escape close, and reduced-motion-compatible transitions.
+- Refined `SiteFooter.jsx` with forest/ivory atelier layout, navigation/contact groups, and newsletter placeholder.
+- Mega menu and utility destinations remain intentionally deferred to the navigation/catalog milestone.
 
 ## Security Note
 
