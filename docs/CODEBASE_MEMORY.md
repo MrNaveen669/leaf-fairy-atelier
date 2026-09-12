@@ -57,7 +57,7 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 
 - Design system: PARTIAL — reusable palette tokens, typography, spacing, buttons, focus states, and motion preferences now exist; no full component system.
 - Header/navigation: PARTIAL — announcement bar, responsive sticky shell, collection/contact links, utility placeholders, and accessible mobile drawer exist; full commerce navigation is deferred.
-- Homepage: PARTIAL — hero, collections, projects, testimonials, and enquiry CTA exist.
+- Homepage: ALIGNED — arched category cards, best sellers, statement olive editorial, shop by space, bespoke/brand row, contact section. Approved homepage structure implemented.
 - PLP/catalog: PARTIAL — collection product grid exists; no full shop, sort, filters, or pagination.
 - PDP: MISSING.
 - Search: MISSING.
@@ -97,10 +97,11 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 ## Current Milestone
 
 `Phase 1.1 — Frontend Foundation & Global Luxury Shell — DONE`
+`Phase 1.2 — Luxury Homepage — DONE`
 
 ## Next Milestone
 
-`Phase 1.2 — Luxury Homepage`
+`Phase 1.3 — Shop / PLP / Collections`
 
 ## Phase 1.1 Notes
 
@@ -108,6 +109,17 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 - Refined `SiteHeader.jsx` with announcement bar, hero/solid modes, utility placeholders, responsive navigation, body scroll lock, Escape close, and reduced-motion-compatible transitions.
 - Refined `SiteFooter.jsx` with forest/ivory atelier layout, navigation/contact groups, and newsletter placeholder.
 - Mega menu and utility destinations remain intentionally deferred to the navigation/catalog milestone.
+
+## Phase 1.2 Notes
+
+- Replaced collections grid with arched category cards (4-col desktop, 2-col mobile).
+- Added Best Sellers section pulling from product API.
+- Replaced "How We Work" with Statement Olive dark editorial section.
+- Reframed portfolio as Shop by Space (5 room categories).
+- Added Bespoke + "Nature in every detail" brand row.
+- Removed testimonials and generic process sections from homepage.
+- New CSS: `.arch-card`, `.statement-olive`, `.space-card`, `.brand-row`, `.bestseller-card`.
+- New data: `categories`, `spaces`, `statementOlive` in `siteContent.js`.
 
 ## Security Note
 

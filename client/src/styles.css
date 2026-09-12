@@ -78,3 +78,113 @@ button:disabled { opacity: .6; cursor: not-allowed; }
 @media (min-width: 1024px) { .site-container { width: min(100% - 5rem, 90rem); } .site-header__bar { padding-inline: 2.5rem; } }
 @media (max-width: 1023px) { .site-header__nav, .site-header__utility { display: none; } .site-header__menu-button { display: inline-flex; justify-self: end; } .site-header__bar { grid-template-columns: 1fr auto; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; } }
+
+/* === Phase 1.2 — Homepage sections === */
+
+/* Arched category cards */
+.arch-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line-on-dark);
+  background: var(--charcoal);
+  border-radius: 999px 999px 2px 2px;
+  aspect-ratio: 3 / 4;
+}
+.arch-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s cubic-bezier(.22,1,.36,1);
+}
+.arch-card:hover img {
+  transform: scale(1.06);
+}
+.arch-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(16,38,29,.72) 0%, rgba(16,38,29,.15) 50%, transparent 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: clamp(1rem, 3vw, 2rem);
+}
+.arch-card__label {
+  color: var(--warm-ivory);
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1.1rem, 2.2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: .02em;
+  line-height: 1.2;
+}
+
+/* Statement olive editorial */
+.statement-olive {
+  background: var(--botanical-green);
+  overflow: hidden;
+}
+.statement-olive__inner {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 5vw, 4rem);
+  align-items: center;
+}
+@media (min-width: 1024px) {
+  .statement-olive__inner { grid-template-columns: 1fr 1fr; }
+}
+
+/* Shop by Space */
+.space-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line-on-dark);
+  background: var(--charcoal);
+}
+.space-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.4s cubic-bezier(.22,1,.36,1);
+}
+.space-card:hover img { transform: scale(1.06); }
+.space-card__overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(0deg, rgba(16,38,29,.65) 0%, transparent 55%);
+  display: flex;
+  align-items: flex-end;
+  padding: clamp(1rem, 2.5vw, 1.75rem);
+}
+.space-card__label {
+  color: var(--warm-ivory);
+  font-family: "Cormorant Garamond", serif;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  font-weight: 500;
+  letter-spacing: .02em;
+}
+
+/* Bespoke / Nature brand row */
+.brand-row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: start;
+}
+@media (min-width: 768px) {
+  .brand-row { grid-template-columns: 1fr 1.2fr 1fr; }
+}
+
+/* Best sellers product card — homepage variant */
+.bestseller-card {
+  border: 1px solid var(--line-on-dark);
+  background: var(--charcoal);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.bestseller-card img {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: transform 1.4s cubic-bezier(.22,1,.36,1);
+}
+.bestseller-card:hover img { transform: scale(1.04); }

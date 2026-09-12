@@ -1,3 +1,191 @@
-import { useEffect,useState } from 'react';import { Link } from 'react-router-dom';import { motion } from 'framer-motion';import { ArrowUpRight,X } from 'lucide-react';import SiteHeader from '../components/SiteHeader.jsx';import SiteFooter from '../components/SiteFooter.jsx';import ContactSection from '../components/ContactSection.jsx';import Reveal from '../components/Reveal.jsx';import { api } from '../api/client.js';import { assurances,heroImg,processSteps,stats } from '../data/siteContent.js';
-const filters=['All','Residential','Hospitality','Commercial'];
-export default function Home(){const[filter,setFilter]=useState('All'),[active,setActive]=useState(null),[collections,setCollections]=useState([]),[projects,setProjects]=useState([]),[testimonials,setTestimonials]=useState([]);useEffect(()=>{Promise.all([api.get('/collections'),api.get('/projects'),api.get('/testimonials')]).then(([c,p,t])=>{setCollections(c);setProjects(p);setTestimonials(t)}).catch(console.error)},[]);const shown=filter==='All'?projects:projects.filter(p=>p.category===filter);return <div className="min-h-screen"><SiteHeader/><main><section className="relative flex min-h-screen items-center overflow-hidden"><img src={heroImg} alt="Sculptural artificial olive tree in a matte black planter inside a dark, brass-accented luxury interior" className="absolute inset-0 h-full w-full object-cover"/><div className="veil absolute inset-0"/><div className="relative mx-auto w-full max-w-7xl px-6 py-32 lg:px-10"><motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}} className="max-w-3xl"><p className="eyebrow">Artificial botanicals · Mumbai atelier</p><h1 className="mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-8xl">Evergreen luxury,<br/><span className="text-brass-gradient italic">perfectly composed.</span></h1><p className="mt-8 max-w-xl text-base leading-relaxed text-muted lg:text-lg">Premium artificial trees, botanicals, florals and decor accessories — hand-composed for homes, hotels and flagship interiors that cannot afford to look temporary.</p><div className="mt-10 flex flex-wrap gap-4"><a href="#collections" className="btn-base btn-brass">View Collections</a><Link to="/contact" className="btn-base btn-ghost-cream">Book a Styling Consult</Link></div></motion.div></div></section><section className="border-y border-border bg-card"><div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-6 py-14 lg:grid-cols-4 lg:px-10">{stats.map((s,i)=><Reveal key={s.label} delay={i*.07}><p className="font-display text-4xl text-brass lg:text-5xl">{s.value}</p><p className="mt-2 text-xs uppercase tracking-[.18em] text-muted">{s.label}</p></Reveal>)}</div></section><section id="collections" className="py-24 lg:py-32"><div className="mx-auto max-w-7xl px-6 lg:px-10"><Reveal><p className="eyebrow">The Collections</p><h2 className="mt-5 text-4xl lg:text-5xl">Four disciplines, one standard of finish.</h2><div className="rule-brass mt-7"/></Reveal><div className="mt-14 grid gap-8 md:grid-cols-2">{collections.map((c,i)=><Reveal key={c.slug} delay={(i%2)*.1}><article className="card-lux group relative h-full overflow-hidden"><div className="relative h-96 lg:h-[28rem]"><img src={c.image} alt={c.alt} className="h-full w-full object-cover transition duration-[1.4s] group-hover:scale-105"/><div className="veil absolute inset-0"/></div><div className="absolute inset-x-0 bottom-0 p-8"><p className="eyebrow">{c.kicker}</p><h3 className="mt-3 text-3xl lg:text-4xl">{c.title}</h3><p className="mt-4 max-w-md text-sm leading-relaxed text-muted">{c.summary}</p><Link to={`/collections/${c.slug}`} className="btn-base btn-brass mt-7">Explore {c.title}<ArrowUpRight size={15}/></Link></div></article></Reveal>)}</div></div></section><section id="portfolio" className="border-t border-border py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><Reveal><div className="flex flex-wrap items-end justify-between gap-8"><div><p className="eyebrow">Selected Work</p><h2 className="mt-5 text-4xl lg:text-5xl">Spaces we've composed.</h2></div><div className="flex flex-wrap gap-2">{filters.map(f=><button key={f} onClick={()=>setFilter(f)} className={`border px-5 py-2 text-xs uppercase tracking-[.18em] ${filter===f?'border-brass text-brass':'border-border text-muted'}`}>{f}</button>)}</div></div></Reveal><div className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">{shown.map((p,i)=><Reveal key={p.title} delay={(i%3)*.08}><button onClick={()=>setActive(p)} className="card-lux group w-full overflow-hidden text-left"><img src={p.image} alt={p.alt} className="h-72 w-full object-cover transition duration-700 group-hover:scale-105"/><div className="p-6"><p className="eyebrow">{p.category} · {p.location}</p><h3 className="mt-3 text-3xl">{p.title}</h3><p className="mt-3 text-sm text-muted">{p.scope}</p></div></button></Reveal>)}</div></div></section><section className="border-t border-border bg-card py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><Reveal><p className="eyebrow">The Leaf Fairy Standard</p><h2 className="mt-5 text-4xl lg:text-5xl">Built to live in finished interiors.</h2></Reveal><div className="mt-12 grid gap-7 md:grid-cols-2 lg:grid-cols-4">{assurances.map((a,i)=><Reveal key={a.title} delay={i*.06}><div className="border-t border-brass pt-5"><h3 className="text-2xl">{a.title}</h3><p className="mt-3 text-sm leading-6 text-muted">{a.body}</p></div></Reveal>)}</div></div></section><section className="py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><Reveal><p className="eyebrow">How We Work</p><h2 className="mt-5 text-4xl lg:text-5xl">From room to finished composition.</h2></Reveal><div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">{processSteps.map((p,i)=><Reveal key={p.step} delay={i*.07}><p className="font-display text-4xl text-brass">{p.step}</p><h3 className="mt-4 text-2xl">{p.title}</h3><p className="mt-3 text-sm leading-6 text-muted">{p.body}</p></Reveal>)}</div></div></section><section className="border-y border-border bg-card py-24"><div className="mx-auto max-w-7xl px-6 lg:px-10"><p className="eyebrow">Sample Testimonials</p><div className="mt-10 grid gap-8 md:grid-cols-3">{testimonials.map((t,i)=><Reveal key={t._id||i} delay={i*.08}><blockquote className="text-xl leading-relaxed">“{t.quote}”</blockquote><p className="mt-5 text-sm text-brass">{t.name}</p><p className="mt-1 text-xs text-muted">{t.role}</p></Reveal>)}</div></div></section><ContactSection/></main>{active&&<div className="fixed inset-0 z-[80] grid place-items-center bg-black/80 p-5" onClick={()=>setActive(null)}><div className="relative max-w-3xl overflow-hidden bg-card" onClick={e=>e.stopPropagation()}><button onClick={()=>setActive(null)} className="absolute right-4 top-4 z-10 rounded-full bg-charcoal/80 p-2"><X/></button><img src={active.image} alt={active.alt} className="h-72 w-full object-cover md:h-96"/><div className="p-7"><p className="eyebrow">{active.category} · {active.location}</p><h3 className="mt-3 text-4xl">{active.title}</h3><p className="mt-5 text-sm leading-7 text-muted">{active.detail}</p></div></div></div>}<SiteFooter/></div>}
+import { useEffect,useState } from 'react';
+import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ArrowUpRight } from 'lucide-react';
+import SiteHeader from '../components/SiteHeader.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
+import ContactSection from '../components/ContactSection.jsx';
+import Reveal from '../components/Reveal.jsx';
+import { api } from '../api/client.js';
+import { categories,heroImg,spaces,statementOlive,stats } from '../data/siteContent.js';
+
+export default function Home(){
+  const [products,setProducts]=useState([]);
+
+  useEffect(()=>{
+    api.get('/products').then(setProducts).catch(()=>{});
+  },[]);
+
+  const bestSellers=products.slice(0,4);
+
+  return (
+    <div className="min-h-screen">
+      <SiteHeader/>
+
+      <main>
+
+        {/* ── Hero ── */}
+        <section className="relative flex min-h-screen items-center overflow-hidden">
+          <img src={heroImg} alt="Sculptural artificial olive tree in a matte black planter inside a dark, brass-accented luxury interior" className="absolute inset-0 h-full w-full object-cover"/>
+          <div className="veil absolute inset-0"/>
+          <div className="relative mx-auto w-full max-w-7xl px-6 py-32 lg:px-10">
+            <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}} className="max-w-3xl">
+              <p className="eyebrow">Artificial botanicals · Mumbai atelier</p>
+              <h1 className="mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-8xl">Evergreen luxury,<br/><span className="text-brass-gradient italic">perfectly composed.</span></h1>
+              <p className="mt-8 max-w-xl text-base leading-relaxed text-muted lg:text-lg">Premium artificial trees, botanicals, florals and decor accessories — hand-composed for homes, hotels and flagship interiors that cannot afford to look temporary.</p>
+              <div className="mt-10 flex flex-wrap gap-4">
+                <a href="#shop-by-category" className="btn-base btn-brass">View Collections</a>
+                <Link to="/contact" className="btn-base btn-ghost-cream">Book a Styling Consult</Link>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ── Stats strip ── */}
+        <section className="border-y border-border bg-card">
+          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-6 py-14 lg:grid-cols-4 lg:px-10">
+            {stats.map((s,i)=><Reveal key={s.label} delay={i*.07}><p className="font-display text-4xl text-brass lg:text-5xl">{s.value}</p><p className="mt-2 text-xs uppercase tracking-[.18em] text-muted">{s.label}</p></Reveal>)}
+          </div>
+        </section>
+
+        {/* ── 1. Shop by Category — Arched Cards ── */}
+        <section id="shop-by-category" className="py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6 lg:px-10">
+            <Reveal>
+              <p className="eyebrow">Shop by Category</p>
+              <h2 className="mt-5 text-4xl lg:text-5xl">Curated botanical disciplines.</h2>
+              <div className="rule-brass mt-7"/>
+            </Reveal>
+            <div className="mt-14 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
+              {categories.map((c,i)=>(
+                <Reveal key={c.slug} delay={i*.08}>
+                  <Link to={`/collections/${c.slug}`} className="arch-card group block">
+                    <img src={c.image} alt={c.alt} loading="lazy"/>
+                    <div className="arch-card__overlay">
+                      <span className="arch-card__label">{c.title}</span>
+                    </div>
+                  </Link>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 2. Best Sellers ── */}
+        {bestSellers.length>0&&(
+          <section className="border-t border-border bg-card py-24 lg:py-32">
+            <div className="mx-auto max-w-7xl px-6 lg:px-10">
+              <Reveal>
+                <div className="flex flex-wrap items-end justify-between gap-8">
+                  <div>
+                    <p className="eyebrow">Best Sellers</p>
+                    <h2 className="mt-5 text-4xl lg:text-5xl">Most-loved pieces.</h2>
+                  </div>
+                  <a href="#shop-by-category" className="text-xs uppercase tracking-[.18em] text-brass hover:text-ivory transition-colors">View all collections <ArrowUpRight size={12} className="inline ml-1"/></a>
+                </div>
+              </Reveal>
+              <div className="mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
+                {bestSellers.map((p,i)=>(
+                  <Reveal key={p._id||p.name} delay={i*.07}>
+                    <article className="bestseller-card group">
+                      <div className="overflow-hidden">
+                        <img src={p.image} alt={p.alt} loading="lazy"/>
+                      </div>
+                      <div className="p-5">
+                        <h3 className="text-xl leading-snug">{p.name}</h3>
+                        <p className="mt-2 font-display text-base text-brass">{p.priceRange}</p>
+                      </div>
+                    </article>
+                  </Reveal>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
+
+        {/* ── 3. Statement Olive Editorial ── */}
+        <section className="statement-olive">
+          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
+            <div className="statement-olive__inner">
+              <Reveal>
+                <div>
+                  <p className="eyebrow">Signature Piece</p>
+                  <h2 className="mt-6 text-4xl leading-[1.1] lg:text-6xl">{statementOlive.title}</h2>
+                  <p className="mt-6 max-w-lg text-base leading-relaxed text-muted lg:text-lg">{statementOlive.copy}</p>
+                  <Link to="/collections/statement-trees" className="btn-base btn-brass mt-8">Explore Statement Trees <ArrowUpRight size={15}/></Link>
+                </div>
+              </Reveal>
+              <Reveal delay={.15}>
+                <div className="overflow-hidden">
+                  <img src={statementOlive.image} alt={statementOlive.alt} className="w-full object-cover lg:h-[28rem]" loading="lazy"/>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ── 4. Shop by Space ── */}
+        <section className="py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6 lg:px-10">
+            <Reveal>
+              <p className="eyebrow">Shop by Space</p>
+              <h2 className="mt-5 text-4xl lg:text-5xl">Styled for every room.</h2>
+              <div className="rule-brass mt-7"/>
+            </Reveal>
+            <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-5 lg:gap-6">
+              {spaces.map((s,i)=>(
+                <Reveal key={s.label} delay={i*.06}>
+                  <div className="space-card aspect-[3/4]">
+                    <img src={s.image} alt={s.alt} loading="lazy"/>
+                    <div className="space-card__overlay">
+                      <span className="space-card__label">{s.label}</span>
+                    </div>
+                  </div>
+                </Reveal>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── 5. Bespoke + Nature in Every Detail ── */}
+        <section className="border-t border-border bg-card py-24 lg:py-32">
+          <div className="mx-auto max-w-7xl px-6 lg:px-10">
+            <div className="brand-row">
+              {/* Left: Bespoke */}
+              <Reveal>
+                <div>
+                  <p className="eyebrow">Bespoke by Leaf Fairy</p>
+                  <h3 className="mt-5 text-3xl lg:text-4xl">Commissioned to your space.</h3>
+                  <p className="mt-4 text-sm leading-7 text-muted">Every vessel, stem and species is specified to your palette, scale and ceiling height. Our atelier composes from brief to installation — no catalogue compromises.</p>
+                  <Link to="/contact" className="btn-base btn-brass mt-8">Book a Consultation <ArrowUpRight size={15}/></Link>
+                </div>
+              </Reveal>
+
+              {/* Center: Image */}
+              <Reveal delay={.1}>
+                <div className="overflow-hidden">
+                  <img src="https://raw.githubusercontent.com/MrNaveen669/leaf-fairy-atelier/main/src/assets/col-botanical.jpg" alt="Detail of artificial botanical arrangement in a brass vessel" className="w-full object-cover aspect-[4/5] lg:aspect-[3/4]" loading="lazy"/>
+                </div>
+              </Reveal>
+
+              {/* Right: Nature in Every Detail */}
+              <Reveal delay={.2}>
+                <div>
+                  <p className="eyebrow">Philosophy</p>
+                  <h3 className="mt-5 text-3xl lg:text-4xl">Nature in every detail.</h3>
+                  <p className="mt-4 text-sm leading-7 text-muted">We study the way light falls through a real canopy, the imperfection of a hand-turned trunk, the weight of a stone planter. Every Leaf Fairy piece begins with observation and ends with a finished interior.</p>
+                </div>
+              </Reveal>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Contact / Enquiry ── */}
+        <ContactSection/>
+
+      </main>
+
+      <SiteFooter/>
+    </div>
+  );
+}
