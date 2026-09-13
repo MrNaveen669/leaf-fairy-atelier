@@ -1,191 +1,180 @@
-import { useEffect,useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowRight, Leaf, PackageCheck, ShieldCheck, Sparkles } from 'lucide-react';
 import SiteHeader from '../components/SiteHeader.jsx';
 import SiteFooter from '../components/SiteFooter.jsx';
-import ContactSection from '../components/ContactSection.jsx';
-import Reveal from '../components/Reveal.jsx';
 import { api } from '../api/client.js';
-import { categories,heroImg,spaces,statementOlive,stats } from '../data/siteContent.js';
+import {
+  heroImg,
+  homepageCategories,
+  homepageProducts,
+  homepageSpaces,
+  imageLibrary,
+} from '../data/siteContent.js';
 
-export default function Home(){
-  const [products,setProducts]=useState([]);
+const perks = [
+  [Leaf, 'Lifelike & Hand-finished'],
+  [ShieldCheck, '3 Year Colour Assurance'],
+  [PackageCheck, 'Pan India Delivery'],
+  [Sparkles, 'White Glove Installation'],
+];
 
-  useEffect(()=>{
-    api.get('/products').then(setProducts).catch(()=>{});
-  },[]);
+function validPrice(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
 
-  const bestSellers=products.slice(0,4);
+export default function Home() {
+  const [collections, setCollections] = useState([]);
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadHomepageData() {
+      const [collectionsResult, productsResult] = await Promise.allSettled([
+        api.get('/collections'),
+        api.get('/products'),
+      ]);
+
+      if (!active) return;
+
+      if (collectionsResult.status === 'fulfilled' && Array.isArray(collectionsResult.value)) {
+        setCollections(collectionsResult.value);
+      }
+
+      if (productsResult.status === 'fulfilled' && Array.isArray(productsResult.value)) {
+        setProducts(productsResult.value);
+      }
+    }
+
+    loadHomepageData();
+    return () => { active = false; };
+  }, []);
+
+  const categories = useMemo(() => {
+    const summariesBySlug = new Map(collections.map(({ slug, summary }) => [slug, summary]));
+
+    return homepageCategories.map((category) => ({
+      ...category,
+      summary: summariesBySlug.get(category.slug) || category.summary,
+    }));
+  }, [collections]);
+
+  const bestSellers = useMemo(() => {
+    const productsByName = new Map(products.map((product) => [product.name, product]));
+
+    return homepageProducts.map((fallback) => {
+      const liveProduct = productsByName.get(fallback.name);
+
+      return {
+        ...fallback,
+        collectionSlug: liveProduct?.collectionSlug || fallback.collectionSlug,
+        name: liveProduct?.name || fallback.name,
+        priceRange: validPrice(liveProduct?.priceRange) ? liveProduct.priceRange : fallback.priceRange,
+      };
+    });
+  }, [products]);
 
   return (
-    <div className="min-h-screen">
-      <SiteHeader/>
-
+    <div className="lux-page">
+      <SiteHeader />
       <main>
-
-        {/* ── Hero ── */}
-        <section className="relative flex min-h-screen items-center overflow-hidden">
-          <img src={heroImg} alt="Sculptural artificial olive tree in a matte black planter inside a dark, brass-accented luxury interior" className="absolute inset-0 h-full w-full object-cover"/>
-          <div className="veil absolute inset-0"/>
-          <div className="relative mx-auto w-full max-w-7xl px-6 py-32 lg:px-10">
-            <motion.div initial={{opacity:0,y:30}} animate={{opacity:1,y:0}} transition={{duration:1,ease:[.22,1,.36,1]}} className="max-w-3xl">
-              <p className="eyebrow">Artificial botanicals · Mumbai atelier</p>
-              <h1 className="mt-6 text-5xl leading-[1.02] sm:text-6xl lg:text-8xl">Evergreen luxury,<br/><span className="text-brass-gradient italic">perfectly composed.</span></h1>
-              <p className="mt-8 max-w-xl text-base leading-relaxed text-muted lg:text-lg">Premium artificial trees, botanicals, florals and decor accessories — hand-composed for homes, hotels and flagship interiors that cannot afford to look temporary.</p>
-              <div className="mt-10 flex flex-wrap gap-4">
-                <a href="#shop-by-category" className="btn-base btn-brass">View Collections</a>
-                <Link to="/contact" className="btn-base btn-ghost-cream">Book a Styling Consult</Link>
-              </div>
-            </motion.div>
-          </div>
-        </section>
-
-        {/* ── Stats strip ── */}
-        <section className="border-y border-border bg-card">
-          <div className="mx-auto grid max-w-7xl grid-cols-2 gap-y-10 px-6 py-14 lg:grid-cols-4 lg:px-10">
-            {stats.map((s,i)=><Reveal key={s.label} delay={i*.07}><p className="font-display text-4xl text-brass lg:text-5xl">{s.value}</p><p className="mt-2 text-xs uppercase tracking-[.18em] text-muted">{s.label}</p></Reveal>)}
-          </div>
-        </section>
-
-        {/* ── 1. Shop by Category — Arched Cards ── */}
-        <section id="shop-by-category" className="py-24 lg:py-32">
-          <div className="mx-auto max-w-7xl px-6 lg:px-10">
-            <Reveal>
-              <p className="eyebrow">Shop by Category</p>
-              <h2 className="mt-5 text-4xl lg:text-5xl">Curated botanical disciplines.</h2>
-              <div className="rule-brass mt-7"/>
-            </Reveal>
-            <div className="mt-14 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
-              {categories.map((c,i)=>(
-                <Reveal key={c.slug} delay={i*.08}>
-                  <Link to={`/collections/${c.slug}`} className="arch-card group block">
-                    <img src={c.image} alt={c.alt} loading="lazy"/>
-                    <div className="arch-card__overlay">
-                      <span className="arch-card__label">{c.title}</span>
-                    </div>
-                  </Link>
-                </Reveal>
-              ))}
+        <section className="editorial-hero" aria-labelledby="hero-title">
+          <img src={heroImg} alt="Luxury interior with a sculptural artificial tree" className="hero-photo" loading="eager" fetchPriority="high" />
+          <div className="hero-shade" aria-hidden="true" />
+          <div className="hero-copy">
+            <p className="micro-label">Artificial botanicals<br />for extraordinary spaces</p>
+            <h1 id="hero-title">Nature,<br /><em>reimagined</em><br />for modern living.</h1>
+            <p className="hero-intro">Premium artificial trees, plants and floral compositions designed to bring timeless beauty to your home, hotel or workspace.</p>
+            <div className="hero-actions">
+              <a href="#collections" className="lux-btn lux-btn-gold">Shop the collection <ArrowRight size={14} /></a>
+              <Link to="/contact" className="lux-btn lux-btn-outline">Explore bespoke</Link>
             </div>
           </div>
-        </section>
-
-        {/* ── 2. Best Sellers ── */}
-        {bestSellers.length>0&&(
-          <section className="border-t border-border bg-card py-24 lg:py-32">
-            <div className="mx-auto max-w-7xl px-6 lg:px-10">
-              <Reveal>
-                <div className="flex flex-wrap items-end justify-between gap-8">
-                  <div>
-                    <p className="eyebrow">Best Sellers</p>
-                    <h2 className="mt-5 text-4xl lg:text-5xl">Most-loved pieces.</h2>
-                  </div>
-                  <a href="#shop-by-category" className="text-xs uppercase tracking-[.18em] text-brass hover:text-ivory transition-colors">View all collections <ArrowUpRight size={12} className="inline ml-1"/></a>
-                </div>
-              </Reveal>
-              <div className="mt-12 grid grid-cols-2 gap-5 lg:grid-cols-4 lg:gap-6">
-                {bestSellers.map((p,i)=>(
-                  <Reveal key={p._id||p.name} delay={i*.07}>
-                    <article className="bestseller-card group">
-                      <div className="overflow-hidden">
-                        <img src={p.image} alt={p.alt} loading="lazy"/>
-                      </div>
-                      <div className="p-5">
-                        <h3 className="text-xl leading-snug">{p.name}</h3>
-                        <p className="mt-2 font-display text-base text-brass">{p.priceRange}</p>
-                      </div>
-                    </article>
-                  </Reveal>
-                ))}
-              </div>
-            </div>
-          </section>
-        )}
-
-        {/* ── 3. Statement Olive Editorial ── */}
-        <section className="statement-olive">
-          <div className="mx-auto max-w-7xl px-6 py-24 lg:px-10 lg:py-32">
-            <div className="statement-olive__inner">
-              <Reveal>
-                <div>
-                  <p className="eyebrow">Signature Piece</p>
-                  <h2 className="mt-6 text-4xl leading-[1.1] lg:text-6xl">{statementOlive.title}</h2>
-                  <p className="mt-6 max-w-lg text-base leading-relaxed text-muted lg:text-lg">{statementOlive.copy}</p>
-                  <Link to="/collections/statement-trees" className="btn-base btn-brass mt-8">Explore Statement Trees <ArrowUpRight size={15}/></Link>
-                </div>
-              </Reveal>
-              <Reveal delay={.15}>
-                <div className="overflow-hidden">
-                  <img src={statementOlive.image} alt={statementOlive.alt} className="w-full object-cover lg:h-[28rem]" loading="lazy"/>
-                </div>
-              </Reveal>
-            </div>
+          <div className="hero-sideword">Spaces<br />that<br />feel<br />more<br />alive</div>
+          <div className="hero-perks" aria-label="Leaf Fairy service assurances">
+            {perks.map(([Icon, text]) => <div key={text}><Icon size={21} /><span>{text}</span></div>)}
           </div>
         </section>
 
-        {/* ── 4. Shop by Space ── */}
-        <section className="py-24 lg:py-32">
-          <div className="mx-auto max-w-7xl px-6 lg:px-10">
-            <Reveal>
-              <p className="eyebrow">Shop by Space</p>
-              <h2 className="mt-5 text-4xl lg:text-5xl">Styled for every room.</h2>
-              <div className="rule-brass mt-7"/>
-            </Reveal>
-            <div className="mt-12 grid grid-cols-2 gap-5 md:grid-cols-3 lg:grid-cols-5 lg:gap-6">
-              {spaces.map((s,i)=>(
-                <Reveal key={s.label} delay={i*.06}>
-                  <div className="space-card aspect-[3/4]">
-                    <img src={s.image} alt={s.alt} loading="lazy"/>
-                    <div className="space-card__overlay">
-                      <span className="space-card__label">{s.label}</span>
-                    </div>
-                  </div>
-                </Reveal>
-              ))}
-            </div>
+        <section id="collections" className="light-section category-section" aria-labelledby="categories-title">
+          <div className="section-heading-row">
+            <div><h2 id="categories-title">Shop by Category</h2><span className="heading-rule" /></div>
+            <a href="#collections" className="section-link">Discover our collections <ArrowRight size={13} /></a>
+          </div>
+          <div className="category-grid">
+            {categories.map((category) => (
+              <Link key={category.slug} to={`/collections/${category.slug}`} className="arch-card">
+                <img src={category.image} alt={category.alt} loading="lazy" style={{ objectPosition: category.position }} />
+                <div className="arch-overlay" aria-hidden="true" />
+                <div className="arch-copy"><h3>{category.title}</h3><p>{category.summary}</p></div>
+              </Link>
+            ))}
           </div>
         </section>
 
-        {/* ── 5. Bespoke + Nature in Every Detail ── */}
-        <section className="border-t border-border bg-card py-24 lg:py-32">
-          <div className="mx-auto max-w-7xl px-6 lg:px-10">
-            <div className="brand-row">
-              {/* Left: Bespoke */}
-              <Reveal>
-                <div>
-                  <p className="eyebrow">Bespoke by Leaf Fairy</p>
-                  <h3 className="mt-5 text-3xl lg:text-4xl">Commissioned to your space.</h3>
-                  <p className="mt-4 text-sm leading-7 text-muted">Every vessel, stem and species is specified to your palette, scale and ceiling height. Our atelier composes from brief to installation — no catalogue compromises.</p>
-                  <Link to="/contact" className="btn-base btn-brass mt-8">Book a Consultation <ArrowUpRight size={15}/></Link>
+        <section className="light-section products-section" aria-labelledby="best-sellers-title">
+          <div className="section-heading-row compact">
+            <div><h2 id="best-sellers-title">Best Sellers</h2><span className="heading-rule" /></div>
+            <p className="subtle-label">Atelier favourites, selected for every kind of space.</p>
+          </div>
+          <div className="best-grid">
+            {bestSellers.map((product) => (
+              <article className="best-card" key={product._id || product.name}>
+                <div className="best-image-wrap"><img src={product.image} alt={product.alt} loading="lazy" style={{ objectPosition: product.position }} /></div>
+                <div className="best-copy">
+                  <h3>{product.name}</h3>
+                  <p className="price-range">{product.priceRange}</p>
+                  <Link className="soft-cta" to={`/collections/${product.collectionSlug}`}>View piece <ArrowRight size={13} /></Link>
                 </div>
-              </Reveal>
-
-              {/* Center: Image */}
-              <Reveal delay={.1}>
-                <div className="overflow-hidden">
-                  <img src="https://raw.githubusercontent.com/MrNaveen669/leaf-fairy-atelier/main/src/assets/col-botanical.jpg" alt="Detail of artificial botanical arrangement in a brass vessel" className="w-full object-cover aspect-[4/5] lg:aspect-[3/4]" loading="lazy"/>
-                </div>
-              </Reveal>
-
-              {/* Right: Nature in Every Detail */}
-              <Reveal delay={.2}>
-                <div>
-                  <p className="eyebrow">Philosophy</p>
-                  <h3 className="mt-5 text-3xl lg:text-4xl">Nature in every detail.</h3>
-                  <p className="mt-4 text-sm leading-7 text-muted">We study the way light falls through a real canopy, the imperfection of a hand-turned trunk, the weight of a stone planter. Every Leaf Fairy piece begins with observation and ends with a finished interior.</p>
-                </div>
-              </Reveal>
-            </div>
+              </article>
+            ))}
           </div>
         </section>
 
-        {/* ── Contact / Enquiry ── */}
-        <ContactSection/>
+        <section className="statement-edit" aria-labelledby="statement-olive-title">
+          <div className="statement-copy">
+            <p className="micro-label gold">Featured edit</p>
+            <h2 id="statement-olive-title">The Statement<br /><em>Olive</em></h2>
+            <p>Hand-finished. Architectural in scale. Designed to look remarkable from every angle.</p>
+            <Link to="/collections/statement-trees" className="lux-btn lux-btn-gold">Shop the edit <ArrowRight size={14} /></Link>
+          </div>
+          <div className="statement-image"><img src={imageLibrary.statementOlive} alt="Statement artificial olive tree in a luxury interior" loading="lazy" /></div>
+          <div className="statement-quote"><p>“More than<br />a plant.<br />A presence.”</p><span>01 &nbsp;&nbsp; 02 &nbsp;&nbsp; 03</span></div>
+        </section>
 
+        <section id="spaces" className="light-section spaces-section" aria-labelledby="spaces-title">
+          <div className="section-heading-row compact">
+            <div><h2 id="spaces-title">Shop by Space</h2><span className="heading-rule" /></div>
+            <p className="subtle-label">Beautiful solutions for every corner.</p>
+          </div>
+          <div className="space-grid">
+            {homepageSpaces.map((space) => (
+              <Link to="/contact" key={space.title} className="space-card">
+                <img src={space.image} alt={space.alt} loading="lazy" style={{ objectPosition: space.position }} />
+                <div className="space-fade" aria-hidden="true" />
+                <h3>{space.title}</h3>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="bespoke-band" aria-labelledby="bespoke-title">
+          <div className="bespoke-copy">
+            <h2 id="bespoke-title">Bespoke by Leaf Fairy</h2>
+            <h3>Can’t find the right scale?</h3>
+            <p>Our atelier creates bespoke botanical compositions for residences, hospitality and commercial interiors.</p>
+            <Link to="/contact" className="lux-btn lux-btn-gold">Book a consultation <ArrowRight size={14} /></Link>
+          </div>
+          <div className="bespoke-image"><img src={imageLibrary.artificialPlants} alt="Layered artificial foliage and sculptural planters" loading="lazy" /></div>
+          <div className="bespoke-dark">
+            <p>Nature in<br />every detail.</p>
+            <span>From lifelike foliage to artisanal planters, every layer is considered.</span>
+            <b>Leaf Fairy Atelier</b>
+          </div>
+        </section>
       </main>
-
-      <SiteFooter/>
+      <SiteFooter />
     </div>
   );
 }

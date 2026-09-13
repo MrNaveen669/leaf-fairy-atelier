@@ -1,3 +1,58 @@
 import { Link } from 'react-router-dom';
-import { PLACEHOLDER_EMAIL,PLACEHOLDER_PHONE } from '../lib/contact.js';
-export default function SiteFooter(){return <footer className="border-t border-white/10 bg-forest text-ivory"><div className="site-container site-section"><div className="grid gap-12 md:grid-cols-[1.4fr_1fr_1fr] lg:gap-20"><div><p className="site-header__brand">Leaf Fairy</p><p className="mt-5 max-w-sm text-sm leading-7 text-muted">Evergreen luxury, perfectly composed. Artificial botanicals and decor composed in Mumbai.</p><p className="mt-8 eyebrow">Private botanical styling</p></div><div><p className="eyebrow">Explore</p><div className="mt-5 grid gap-3 text-sm text-muted"><Link className="footer-link" to="/">Home</Link><a className="footer-link" href="/#collections">Collections</a><Link className="footer-link" to="/contact">Contact</Link><span className="text-muted/70">Journal <small>(coming soon)</small></span></div></div><div><p className="eyebrow">The atelier</p><div className="mt-5 grid gap-3 text-sm text-muted"><span>{PLACEHOLDER_PHONE}</span><span>{PLACEHOLDER_EMAIL}</span><span>Trade and project enquiries welcome</span><span className="text-muted/70">Newsletter opening soon</span></div></div></div></div><div className="border-t border-white/10"><div className="site-container flex flex-col gap-3 py-5 text-xs text-muted sm:flex-row sm:items-center sm:justify-between"><span>© {new Date().getFullYear()} Leaf Fairy Atelier.</span><span>Privacy · Terms</span></div></div></footer>}
+import { ArrowRight } from 'lucide-react';
+
+export default function SiteFooter() {
+  return (
+    <footer className="site-footer-premium">
+      <div className="footer-main">
+        <div className="footer-brand">
+          <Link to="/" className="brand-lockup">
+            <span className="brand-mark">♧</span>
+            <span><strong>Leaf Fairy</strong><small>ATELIER</small></span>
+          </Link>
+          <p>Nature lives better indoors.</p>
+        </div>
+
+        <div className="footer-col">
+          <h4>Shop</h4>
+          <Link to="/shop">All Products</Link>
+          <Link to="/collections/statement-trees">Statement Trees</Link>
+          <Link to="/collections/botanical-studies">Plants</Link>
+          <Link to="/collections/florals-orchids">Florals & Orchids</Link>
+          <Link to="/collections/decor-accessories">Planters & Décor</Link>
+        </div>
+
+        <div className="footer-col">
+          <h4>Customer Care</h4>
+          <Link to="/contact">Shipping & Delivery</Link>
+          <Link to="/contact">Returns & Refunds</Link>
+          <Link to="/contact">Care Guide</Link>
+          <Link to="/contact">FAQs</Link>
+          <Link to="/contact">Contact Us</Link>
+        </div>
+
+        <div className="footer-col">
+          <h4>Our Story</h4>
+          <Link to="/contact">About Leaf Fairy</Link>
+          <Link to="/contact">Our Process</Link>
+          <Link to="/contact">Bespoke Services</Link>
+          <Link to="/contact">Trade Program</Link>
+        </div>
+
+        <div className="newsletter">
+          <h4>Join our world</h4>
+          <p>Get inspiration, new arrivals and exclusive offers.</p>
+          <form className="newsletter-form" onSubmit={(e) => e.preventDefault()}>
+            <input type="email" aria-label="Email address" placeholder="Your email address" />
+            <button type="submit" aria-label="Join newsletter"><ArrowRight size={14} /></button>
+          </form>
+        </div>
+      </div>
+
+      <div className="footer-bottom">
+        <span>© {new Date().getFullYear()} Leaf Fairy Atelier. All rights reserved.</span>
+        <span>Plants &nbsp; | &nbsp; People &nbsp; | &nbsp; A brighter tomorrow</span>
+      </div>
+    </footer>
+  );
+}
