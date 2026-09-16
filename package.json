@@ -2,12 +2,14 @@
   "name": "leaf-fairy-atelier",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\"",
+    "dev": "concurrently \"npm run dev --prefix server\" \"npm run dev --prefix client\" \"npm run dev --prefix admin\"",
+    "dev:admin": "npm run dev --prefix admin",
     "seed": "npm run seed --prefix server",
-    "install:all": "npm install",
-    "build": "npm run build --prefix client",
+    "install:all": "npm install && npm install --prefix client && npm install --prefix admin && npm install --prefix server",
+    "build": "npm run build --prefix client && npm run build --prefix admin",
+    "build:admin": "npm run build --prefix admin",
     "start": "npm run start --prefix server",
-    "postinstall": "npm install --prefix client && npm install --prefix server"
+    "postinstall": "npm install --prefix client && npm install --prefix admin && npm install --prefix server"
   },
   "devDependencies": {
     "concurrently": "^9.1.2"
