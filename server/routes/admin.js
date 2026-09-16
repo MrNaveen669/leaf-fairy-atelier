@@ -1,12 +1,13 @@
 import { Router } from 'express';
 import { adminAccess } from '../middleware/adminAccess.js';
-import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, archiveContent } from '../controllers/admin.js';
+import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, archiveCollection, productTypes, createProductType, updateProductType, archiveProductType, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, archiveContent } from '../controllers/admin.js';
 import { mediaStatus, uploadMedia } from '../controllers/media.js';
 const router=Router();
 router.use(adminAccess);
 router.get('/dashboard',dashboard);
 router.get('/products',products);router.post('/products',createProduct);router.patch('/products/:id',updateProduct);
-router.get('/collections',collections);router.post('/collections',createCollection);router.patch('/collections/:id',updateCollection);
+router.get('/collections',collections);router.post('/collections',createCollection);router.patch('/collections/:id',updateCollection);router.patch('/collections/:id/archive',archiveCollection);
+router.get('/product-types',productTypes);router.post('/product-types',createProductType);router.patch('/product-types/:id',updateProductType);router.patch('/product-types/:id/archive',archiveProductType);
 router.get('/inventory',inventory);router.patch('/inventory/:id',updateInventory);
 router.get('/orders',orders);router.patch('/orders/:id',updateOrder);
 router.get('/enquiries',enquiries);router.patch('/enquiries/:id',updateEnquiry);
