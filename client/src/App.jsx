@@ -9,6 +9,7 @@ import WishlistPage from './pages/WishlistPage.jsx';
 import AuthPage from './pages/AuthPage.jsx';
 import AccountPage from './pages/AccountPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
+import AdminPage from './pages/AdminPage.jsx';
 
 export default function App() {
   return <Routes>
@@ -22,6 +23,7 @@ export default function App() {
     <Route path="/login" element={<AuthPage mode="login" />} />
     <Route path="/register" element={<AuthPage mode="register" />} />
     <Route path="/account" element={<AccountPage />} />
+    <Route path="/admin" element={<AdminPage />} />
     <Route path="/contact" element={<ContactPage />} />
     <Route path="*" element={<div className="min-h-screen grid place-items-center p-8"><div className="text-center"><p className="eyebrow">404</p><h1 className="mt-4 text-5xl">Page not found.</h1><a href="/" className="btn-base btn-brass mt-8">Return home</a></div></div>} />
   </Routes>;
