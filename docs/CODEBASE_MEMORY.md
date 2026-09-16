@@ -1,142 +1,58 @@
 # Leaf Fairy — Codebase Memory
 
 ## Project
-
 Leaf Fairy — premium/luxury botanical e-commerce platform.
 
-## Current Repository
-
-`/mnt/newvolume/WebAksh/Leaf Fairy/leaf-fairy-atelier`
-
 ## Source of Truth
-
-- PRD: `docs/01-PRD-Leaf-Fairy.md`
-- TRD: `docs/02-TRD-Leaf-Fairy.md`
-- UI/UX Specification: `docs/03-UI-UX-Specification-Leaf-Fairy.md`
-- Backend Database Schema: `docs/04-Backend-Schema-Leaf-Fairy.md`
-
-These documents override stale README assumptions.
+PRD/TRD/UI-UX/Backend Schema → approved screenshots → this memory → current code → README.
 
 ## Current Implementation
+- Frontend: React 19, Vite 6, JavaScript/JSX, React Router 6, Tailwind directives + custom CSS.
+- Backend: Node/Express 4, MongoDB/Mongoose, Zod enquiry validation.
+- Public catalogue remains enquiry-led; `priceRange` is display-only and there is no authoritative numeric sellable price, variant inventory, payment or order API yet.
+- Routes now include `/`, `/shop`, collections, PDP, `/wishlist`, `/cart`, `/checkout`, `/login`, `/register`, `/account`, `/contact`.
 
-- Frontend: React 19 with Vite 6, JavaScript/JSX.
-- Routing: React Router DOM 6.
-- Styling: Tailwind CSS 3 directives plus custom global CSS.
-- Animation: Framer Motion.
-- Backend: Node.js with Express 4 and ESM.
-- Database/ODM: MongoDB with Mongoose.
-- Validation: Zod for enquiry requests.
-- Pages/routes: `/`, `/shop`, `/collections/:slug`, `/products/:id`, `/contact`, and a 404 fallback.
-- API: `GET /api/health`; collection list/detail; product list/detail; projects list; testimonials list; validated `POST /api/enquiries`.
-- Current data is catalogue/enquiry-led; `priceRange` is display-only.
+## Commerce State
+- Phase 1.5 guest cart/wishlist uses isolated versioned localStorage state keyed by stable product IDs; catalogue data is resolved from the current API rather than duplicated as merchant snapshots.
+- Cart supports add/remove/quantity/clear and wishlist supports toggle/persistence/counts.
+- Header, ProductCard and PDP are connected to commerce state.
+- Client cart is non-authoritative. Future checkout must revalidate numeric pricing, variants, inventory, discounts, shipping and tax server-side.
 
-## Target Architecture
-
-The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node backend, PostgreSQL database, Prisma ORM, feature-oriented modules, authentication, commerce, and admin APIs. This is target state, not the current implementation.
+## Checkout + Account Foundation
+- Phase 1.6 storefront routes and premium UI foundation exist for login, registration, account dashboard and checkout delivery details.
+- Account session is deliberately a local storefront prototype only; it is NOT production authentication. Passwords are not persisted by the client context.
+- Checkout does not fabricate totals, shipping, tax, payment, inventory or order placement. Until backend commerce exists it ends in an atelier order-enquiry handoff.
+- Orders and address-management UI are represented as unavailable account capabilities rather than fake persisted commerce records.
+- Production auth must use the TRD security model: hashed passwords, HTTP-only secure/SameSite session cookies or equivalent secure token strategy, rate limiting, reset expiry, and server authorization.
 
 ## Existing UI Worth Preserving
+Luxury editorial botanical direction, approved homepage, aligned PLP/PDP, responsive global shell, enquiry experience, and restrained forest/ivory/gold design system.
 
-- Luxury/editorial botanical visual direction with restrained motion and serif display type.
-- Full-bleed hero and collection storytelling.
-- Collection product-card/grid presentation.
-- Projects and testimonials sections.
-- Contact/enquiry experience with client and server validation.
+## Known Data / Architecture Limitations
+- Product data lacks numeric transactional price, structured variants/SKU, inventory and multiple product media.
+- Backend currently exposes catalogue/content/enquiry APIs only; auth/account/checkout/order/payment APIs are not implemented.
+- Current MongoDB/JavaScript implementation must not be automatically migrated to PostgreSQL/Prisma or TypeScript without an explicit milestone.
+- No tests, lint, typecheck or CI currently exist.
 
-## Important Paths
-
-- [client/src/App.jsx](../client/src/App.jsx) — routing.
-- [client/src/pages/](../client/src/pages/) — current screens.
-- [client/src/components/](../client/src/components/) — shared UI.
-- [client/src/styles.css](../client/src/styles.css) — global visual foundation.
-- [client/src/api/client.js](../client/src/api/client.js) — API wrapper.
-- [server/server.js](../server/server.js) — API bootstrap and production serving.
-- [server/routes/](../server/routes/), [server/controllers/](../server/controllers/), [server/models/](../server/models/) — API/data layers.
-- [server/seed/seed.js](../server/seed/seed.js) — disposable content bootstrap.
-
-## Current Feature Status
-
-- Design system: PARTIAL — reusable palette tokens, typography, spacing, buttons, focus states, and motion preferences now exist; no full component system.
-- Header/navigation: PARTIAL — announcement bar, responsive sticky shell, collection/contact links, utility placeholders, and accessible mobile drawer exist; full commerce navigation is deferred.
-- Homepage: ALIGNED — arched category cards, best sellers, statement olive editorial, shop by space, bespoke/brand row, contact section. Approved homepage structure implemented.
-- PLP/catalog: ALIGNED — editorial all-shop and collection listings, responsive image-first grid, category filtering, supported sort choices, and loading/empty/error states.
-- PDP: ALIGNED — API-backed product page with an editorial gallery, truthful product fields, enquiry-led quantity control, service/bespoke sections, and catalogue-based related products.
-- Search: MISSING.
-- Wishlist: MISSING.
-- Cart: MISSING.
-- Checkout: MISSING.
-- Auth: MISSING.
-- Account: MISSING.
-- Backend APIs: PARTIAL — public catalogue/content, health, and enquiry endpoints only.
-- Database: PARTIAL — MongoDB/Mongoose models for collections, products, projects, testimonials, and enquiries.
-- Admin: MISSING.
-- CMS: MISSING.
-- Responsive UX: PARTIAL — shell is responsive with touch-sized controls, scroll lock, Escape handling, focus states, and reduced-motion support; broader page accessibility and edge states need work.
-- SEO: MISSING — no route metadata, structured data, sitemap, or robots configuration.
-
-## Known Issues
-
-- `server/seed/seed.js` clears and reinserts catalogue collections; treat it as destructive disposable-environment tooling.
-- Product data lacks transactional variants, inventory, and numeric sellable prices.
-- Images use remote GitHub raw URLs rather than an owned asset pipeline.
-- API empty/error states, mobile-menu accessibility, and reduced-motion handling need improvement.
-- No tests, lint, typecheck, or CI are currently present.
-
-## Rules for Future Codex Tasks
-
-1. Read `docs/CODEBASE_MEMORY.md` first.
-2. Do not re-audit the full repository unless explicitly requested.
-3. Inspect only files relevant to the current task.
-4. PRD/TRD/UI-UX/Backend Schema are higher authority than README.
-5. Preserve useful existing UI where practical.
-6. Avoid unnecessary dependency installation.
-7. Do not migrate MongoDB → PostgreSQL unless explicitly instructed.
-8. Do not convert JavaScript → TypeScript unless explicitly instructed.
-9. Update this memory only when meaningful project state changes.
-10. Keep this file compact.
+## Rules for Future Tasks
+1. Read this file first; do not re-audit the repo.
+2. Inspect only files relevant to the active milestone and relevant spec sections.
+3. Preserve approved UI and working code; no unrelated refactors.
+4. Anything merchant-editable must remain data-driven/admin-ready; do not hardcode catalog/CMS data merely to match screenshots.
+5. Local cart/account state must never become authoritative pricing/payment/order data.
+6. Avoid unnecessary dependencies and broad scans.
+7. Update only affected memory sections after meaningful changes.
 
 ## Current Milestone
-
-`Phase 1.1 — Frontend Foundation & Global Luxury Shell — DONE`
+`Phase 1.1 — Frontend Foundation / Global Luxury Shell — DONE`
 `Phase 1.2 — Luxury Homepage — DONE`
 `Phase 1.3 — Shop / PLP / Collections — DONE`
 `Phase 1.4 — Product Detail Page — DONE`
+`Phase 1.5 — Wishlist + Cart — IMPLEMENTED; local production-build verification still required`
+`Phase 1.6 — Checkout + Auth + Account — FRONTEND FOUNDATION IMPLEMENTED; secure backend auth/transactional checkout blocked by current catalogue/backend data`
 
 ## Next Milestone
-
-`Phase 1.5 — Wishlist + Cart`
-
-## Phase 1.1 Notes
-
-- Refined `styles.css` and Tailwind tokens around the specified forest, ivory, parchment, sage, clay, and restrained antique-gold palette.
-- Refined `SiteHeader.jsx` with announcement bar, hero/solid modes, utility placeholders, responsive navigation, body scroll lock, Escape close, and reduced-motion-compatible transitions.
-- Refined `SiteFooter.jsx` with forest/ivory atelier layout, navigation/contact groups, and newsletter placeholder.
-- Mega menu and utility destinations remain intentionally deferred to the navigation/catalog milestone.
-
-## Phase 1.2 Notes
-
-- Replaced collections grid with arched category cards (4-col desktop, 2-col mobile).
-- Added Best Sellers section pulling from product API.
-- Replaced "How We Work" with Statement Olive dark editorial section.
-- Reframed portfolio as Shop by Space (5 room categories).
-- Added Bespoke + "Nature in every detail" brand row.
-- Removed testimonials and generic process sections from homepage.
-- New CSS: `.arch-card`, `.statement-olive`, `.space-card`, `.brand-row`, `.bestseller-card`.
-- New data: `categories`, `spaces`, `statementOlive` in `siteContent.js`.
-
-## Phase 1.3 Notes
-
-- Added `/shop` with an editorial all-products listing, local listing art, category filter, and only data-supported Newest/Name A–Z sort choices.
-- Refined collection listings with compact responsive product cards, collection navigation, product counts, and loading/empty/error states.
-- Product cards retain the existing WhatsApp enquiry flow and link product media/titles to `/products/:id`.
-- Local category media is used as a graceful image fallback while the API’s product-image URLs remain remote.
-
-## Phase 1.4 Notes
-
-- `/products/:id` uses `GET /api/products/:id` with loading, unavailable, and not-found states; a local category image is used if a product image fails.
-- Current product data supports only `_id`, collection, name, description, display-only `priceRange`, image, and alt text. The gallery is therefore one real image with an accessible enlarged-image view; no video, extra media, SKU, ratings, structured variants, inventory, numeric price, tax, or delivery lookup exists.
-- Quantity only makes the existing WhatsApp enquiry more specific; cart, wishlist, and checkout remain deferred to Phase 1.5.
-- Related rows reuse `GET /api/products`, exclude the active product, and prioritize its collection before other catalogue pieces.
+`Phase 1.7 — Backend / Commerce Database`
 
 ## Security Note
-
-Credential rotation/revocation required if previously valid.
+Credential rotation/revocation required if previously valid. Never restore exposed credentials.
