@@ -7,7 +7,8 @@
     "dev": "node --watch server.js",
     "start": "node server.js",
     "seed": "node seed/seed.js",
-    "seed:commerce": "node seed/commerceSeed.js"
+    "seed:commerce": "node seed/commerceSeed.js",
+    "seed:admin": "node seed/adminSeed.js"
   },
   "dependencies": {
     "cors": "^2.8.5",
