@@ -13,10 +13,14 @@ import commerce from './routes/commerce.js';
 import admin from './routes/admin.js';
 import payments from './routes/payments.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
+import { securityHeaders } from './middleware/security.js';
 
 const app = express(); const PORT = process.env.PORT || 5000;
 const allowedOrigins=(process.env.CLIENT_URLS||process.env.CLIENT_URL||'http://localhost:5173,http://localhost:5174').split(',').map(value=>value.trim()).filter(Boolean);
-app.use(cors({origin(origin,callback){if(!origin||allowedOrigins.includes(origin))return callback(null,true);callback(new Error('Origin not allowed by CORS'))}}));
+app.disable('x-powered-by');
+app.set('trust proxy',1);
+app.use(securityHeaders);
+app.use(cors({credentials:true,origin(origin,callback){if(!origin||allowedOrigins.includes(origin))return callback(null,true);callback(new Error('Origin not allowed by CORS'))}}));
 app.use('/api/admin/media/upload', express.raw({ type:['image/jpeg','image/png','image/webp'], limit:'8mb' }));
 app.use(express.json({ limit: '100kb' }));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
