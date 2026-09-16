@@ -8,6 +8,7 @@ const imageSchema = new mongoose.Schema({
 }, { _id: true });
 const schema = new mongoose.Schema({
   collectionSlug: { type: String, required: true, index: true },
+  productTypeSlug: { type: String, default: '', index: true },
   name: { type: String, required: true }, description: String, priceRange: String, image: String, alt: String,
   images: { type: [imageSchema], default: [] },
   slug: { type: String, index: true }, featured: { type: Boolean, default: false },
