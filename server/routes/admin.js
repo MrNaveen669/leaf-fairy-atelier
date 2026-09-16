@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { adminAccess } from '../middleware/adminAccess.js';
-import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, archiveCollection, productTypes, createProductType, updateProductType, archiveProductType, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, archiveContent } from '../controllers/admin.js';
+import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, archiveCollection, productTypes, createProductType, updateProductType, archiveProductType, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, publishContent, archiveContent } from '../controllers/admin.js';
 import { mediaStatus, uploadMedia } from '../controllers/media.js';
 const router=Router();
 router.use(adminAccess);
@@ -11,6 +11,6 @@ router.get('/product-types',productTypes);router.post('/product-types',createPro
 router.get('/inventory',inventory);router.patch('/inventory/:id',updateInventory);
 router.get('/orders',orders);router.patch('/orders/:id',updateOrder);
 router.get('/enquiries',enquiries);router.patch('/enquiries/:id',updateEnquiry);
-router.get('/content',content);router.put('/content/:key',saveContent);router.patch('/content/:key/archive',archiveContent);
+router.get('/content',content);router.put('/content/:key',saveContent);router.patch('/content/:key/publish',publishContent);router.patch('/content/:key/archive',archiveContent);
 router.get('/media/status',mediaStatus);router.post('/media/upload',uploadMedia);
 export default router;
