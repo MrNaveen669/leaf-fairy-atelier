@@ -9,9 +9,10 @@ const schema = new mongoose.Schema({
   image: String,
   ctaLabel: String,
   ctaHref: String,
-  enabled: { type: Boolean, default: true },
+  enabled: { type: Boolean, default: true, index: true },
   sortOrder: { type: Number, default: 0 },
   metadata: { type: mongoose.Schema.Types.Mixed, default: {} },
+  publishedAt: { type: Date, default: null },
 }, { timestamps: true });
 
 export default mongoose.model('ContentBlock', schema);
