@@ -1,6 +1,8 @@
 import { Router } from 'express';
+import express from 'express';
 import { adminAccess } from '../middleware/adminAccess.js';
 import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, archiveContent } from '../controllers/admin.js';
+import { mediaStatus, uploadMedia } from '../controllers/media.js';
 const router=Router();
 router.use(adminAccess);
 router.get('/dashboard',dashboard);
@@ -10,4 +12,6 @@ router.get('/inventory',inventory);router.patch('/inventory/:id',updateInventory
 router.get('/orders',orders);router.patch('/orders/:id',updateOrder);
 router.get('/enquiries',enquiries);router.patch('/enquiries/:id',updateEnquiry);
 router.get('/content',content);router.put('/content/:key',saveContent);router.patch('/content/:key/archive',archiveContent);
+router.get('/media/status',mediaStatus);
+router.post('/media/upload',express.raw({type:['image/jpeg','image/png','image/webp'],limit:'8mb'}),uploadMedia);
 export default router;
