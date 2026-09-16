@@ -1,0 +1,16 @@
+import { Router } from 'express';
+import { adminAccess } from '../middleware/adminAccess.js';
+import { dashboard, products, updateProduct, inventory, updateInventory, orders, enquiries, content, saveContent } from '../controllers/admin.js';
+
+const router = Router();
+router.use(adminAccess);
+router.get('/dashboard', dashboard);
+router.get('/products', products);
+router.patch('/products/:id', updateProduct);
+router.get('/inventory', inventory);
+router.patch('/inventory/:id', updateInventory);
+router.get('/orders', orders);
+router.get('/enquiries', enquiries);
+router.get('/content', content);
+router.put('/content/:key', saveContent);
+export default router;
