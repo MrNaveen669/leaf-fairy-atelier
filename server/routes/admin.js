@@ -1,13 +1,14 @@
 import { Router } from 'express';
 import { adminAccess } from '../middleware/adminAccess.js';
 import { adminLoginRateLimit } from '../middleware/security.js';
-import { login,logout,session } from '../controllers/adminAuth.js';
+import { changePassword,login,logout,session } from '../controllers/adminAuth.js';
 import { dashboard, products, createProduct, updateProduct, collections, createCollection, updateCollection, archiveCollection, productTypes, createProductType, updateProductType, archiveProductType, inventory, updateInventory, orders, updateOrder, enquiries, updateEnquiry, content, saveContent, publishContent, archiveContent } from '../controllers/admin.js';
 import { mediaStatus, uploadMedia } from '../controllers/media.js';
 const router=Router();
 router.post('/auth/login',adminLoginRateLimit,login);
 router.get('/auth/session',adminAccess,session);
 router.post('/auth/logout',adminAccess,logout);
+router.post('/auth/change-password',adminAccess,changePassword);
 router.use(adminAccess);
 router.get('/dashboard',dashboard);
 router.get('/products',products);router.post('/products',createProduct);router.patch('/products/:id',updateProduct);
