@@ -1,0 +1,16 @@
+import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
+import SiteHeader from '../components/SiteHeader.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
+import { api } from '../api/client.js';
+import { useCommerce } from '../state/CommerceContext.jsx';
+import { whatsappLink } from '../lib/contact.js';
+
+export default function CheckoutPage() {
+  const { cart } = useCommerce(); const [products, setProducts] = useState([]); const [contact, setContact] = useState({ email: '', name: '', phone: '', address: '', city: '', state: '', pincode: '' });
+  useEffect(() => { api.get('/products').then((items) => setProducts(Array.isArray(items) ? items : [])).catch(() => setProducts([])); }, []);
+  const lines = cart.map((line) => ({ ...line, product: products.find((p) => p._id === line.productId) })).filter((line) => line.product);
+  const message = `Hello Leaf Fairy, I would like to complete an order enquiry.\n${lines.map((line) => `• ${line.product.name} × ${line.quantity}`).join('\n')}\nName: ${contact.name}\nEmail: ${contact.email}\nPhone: ${contact.phone}\nCity: ${contact.city}, ${contact.state} ${contact.pincode}`;
+  if (!cart.length) return <div className="account-page"><SiteHeader /><main className="checkout-empty"><h1>Your bag is empty.</h1><Link className="account-primary" to="/shop">Return to shop</Link></main><SiteFooter /></div>;
+  return <div className="account-page"><SiteHeader /><main className="checkout-shell"><form className="checkout-form"><p className="eyebrow">Checkout foundation</p><h1>Delivery details</h1><div className="checkout-fields"><label>Email<input required type="email" value={contact.email} onChange={(e) => setContact({ ...contact, email: e.target.value })} /></label><label>Full name<input required value={contact.name} onChange={(e) => setContact({ ...contact, name: e.target.value })} /></label><label>Phone<input required value={contact.phone} onChange={(e) => setContact({ ...contact, phone: e.target.value })} /></label><label className="wide">Address<input required value={contact.address} onChange={(e) => setContact({ ...contact, address: e.target.value })} /></label><label>City<input required value={contact.city} onChange={(e) => setContact({ ...contact, city: e.target.value })} /></label><label>State<input required value={contact.state} onChange={(e) => setContact({ ...contact, state: e.target.value })} /></label><label>Pincode<input required inputMode="numeric" value={contact.pincode} onChange={(e) => setContact({ ...contact, pincode: e.target.value })} /></label></div><p className="checkout-note">Payment, tax, shipping rates and final order placement require server-validated numeric pricing and inventory. They are intentionally not fabricated in this phase.</p></form><aside className="checkout-summary"><p className="eyebrow">Your selection</p>{lines.map((line) => <div className="checkout-line" key={line.productId}><span>{line.product.name}</span><b>× {line.quantity}</b></div>)}<p>Final pricing, availability, delivery and installation will be confirmed by the atelier.</p><a className="account-primary" href={whatsappLink(message)} target="_blank" rel="noreferrer">Continue as order enquiry</a></aside></main><SiteFooter /></div>;
+}
