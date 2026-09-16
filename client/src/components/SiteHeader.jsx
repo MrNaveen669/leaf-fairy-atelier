@@ -4,42 +4,14 @@ import { Heart, Menu, Search, ShoppingBag, UserRound, X } from 'lucide-react';
 import { api } from '../api/client.js';
 import { catalogCollectionLinks } from '../data/catalogContent.js';
 import { useCommerce } from '../state/CommerceContext.jsx';
+import { useAuth } from '../state/AuthContext.jsx';
 
 export default function SiteHeader() {
-  const [open, setOpen] = useState(false);
-  const [collections, setCollections] = useState([]);
-  const location = useLocation();
-  const { wishlistCount, cartCount } = useCommerce();
-
-  useEffect(() => { api.get('/collections').then(setCollections).catch(() => {}); }, []);
-  useEffect(() => { setOpen(false); }, [location.pathname]);
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = open ? 'hidden' : previousOverflow;
-    return () => { document.body.style.overflow = previousOverflow; };
-  }, [open]);
-  useEffect(() => {
-    const closeOnEscape = (event) => { if (event.key === 'Escape') setOpen(false); };
-    window.addEventListener('keydown', closeOnEscape);
-    return () => window.removeEventListener('keydown', closeOnEscape);
-  }, []);
-
+  const [open, setOpen] = useState(false); const [collections, setCollections] = useState([]); const location = useLocation(); const { wishlistCount, cartCount } = useCommerce(); const { account } = useAuth();
+  useEffect(() => { api.get('/collections').then(setCollections).catch(() => {}); }, []); useEffect(() => { setOpen(false); }, [location.pathname]);
+  useEffect(() => { const previousOverflow = document.body.style.overflow; document.body.style.overflow = open ? 'hidden' : previousOverflow; return () => { document.body.style.overflow = previousOverflow; }; }, [open]);
+  useEffect(() => { const handler = (event) => { if (event.key === 'Escape') setOpen(false); }; window.addEventListener('keydown', handler); return () => window.removeEventListener('keydown', handler); }, []);
   const collectionLinks = collections.length ? collections.slice(0, 4).map((collection) => ({ label: collection.title, to: `/collections/${collection.slug}` })) : catalogCollectionLinks.map((collection) => ({ label: collection.title, to: `/collections/${collection.slug}` }));
   const links = [{ label: 'Shop', to: '/shop' }, ...collectionLinks, { label: 'By Space', to: '/#spaces' }, { label: 'Bespoke', to: '/contact' }];
-
-  return <header className="store-header">
-    <div className="announcement-bar"><span>Evergreen beauty. A brighter tomorrow.</span><span className="hidden sm:inline">Mumbai &nbsp; | &nbsp; Pan India Delivery &nbsp; | &nbsp; Trade Enquiries</span></div>
-    <div className="store-nav">
-      <Link to="/" className="brand-lockup" aria-label="Leaf Fairy home"><span className="brand-mark">♧</span><span><strong>Leaf Fairy</strong><small>ATELIER</small></span></Link>
-      <nav className="desktop-nav">{links.map((link) => <NavLink key={`${link.label}-${link.to}`} to={link.to}>{link.label}</NavLink>)}</nav>
-      <div className="nav-actions">
-        <label className="nav-search hidden xl:flex"><Search size={15} /><input readOnly aria-label="Catalogue search coming soon" placeholder="Search coming soon" title="Catalogue search is coming soon" /></label>
-        <button type="button" aria-label="Account coming soon" title="Account area coming soon" className="hidden sm:grid"><UserRound size={18} /></button>
-        <Link to="/wishlist" className="nav-commerce-action hidden sm:grid" aria-label={`Wishlist, ${wishlistCount} saved`}><Heart size={18} />{wishlistCount > 0 && <span>{wishlistCount}</span>}</Link>
-        <Link to="/cart" className="nav-commerce-action" aria-label={`Bag, ${cartCount} items`}><ShoppingBag size={18} />{cartCount > 0 && <span>{cartCount}</span>}</Link>
-        <button type="button" className="menu-toggle lg:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="mobile-navigation">{open ? <X size={22} /> : <Menu size={22} />}</button>
-      </div>
-    </div>
-    {open && <nav id="mobile-navigation" className="mobile-nav">{links.map((link) => <NavLink onClick={() => setOpen(false)} key={`${link.label}-${link.to}`} to={link.to}>{link.label}</NavLink>)}<NavLink onClick={() => setOpen(false)} to="/wishlist">Wishlist ({wishlistCount})</NavLink><NavLink onClick={() => setOpen(false)} to="/cart">Bag ({cartCount})</NavLink></nav>}
-  </header>;
+  return <header className="store-header"><div className="announcement-bar"><span>Evergreen beauty. A brighter tomorrow.</span><span className="hidden sm:inline">Mumbai &nbsp; | &nbsp; Pan India Delivery &nbsp; | &nbsp; Trade Enquiries</span></div><div className="store-nav"><Link to="/" className="brand-lockup" aria-label="Leaf Fairy home"><span className="brand-mark">♧</span><span><strong>Leaf Fairy</strong><small>ATELIER</small></span></Link><nav className="desktop-nav">{links.map((link) => <NavLink key={`${link.label}-${link.to}`} to={link.to}>{link.label}</NavLink>)}</nav><div className="nav-actions"><label className="nav-search hidden xl:flex"><Search size={15} /><input readOnly aria-label="Catalogue search coming soon" placeholder="Search coming soon" /></label><Link to={account ? '/account' : '/login'} className="nav-commerce-action hidden sm:grid" aria-label={account ? 'Your account' : 'Sign in'}><UserRound size={18} /></Link><Link to="/wishlist" className="nav-commerce-action hidden sm:grid" aria-label={`Wishlist, ${wishlistCount} saved`}><Heart size={18} />{wishlistCount > 0 && <span>{wishlistCount}</span>}</Link><Link to="/cart" className="nav-commerce-action" aria-label={`Bag, ${cartCount} items`}><ShoppingBag size={18} />{cartCount > 0 && <span>{cartCount}</span>}</Link><button type="button" className="menu-toggle lg:hidden" onClick={() => setOpen((value) => !value)} aria-label={open ? 'Close navigation' : 'Open navigation'} aria-expanded={open} aria-controls="mobile-navigation">{open ? <X size={22} /> : <Menu size={22} />}</button></div></div>{open && <nav id="mobile-navigation" className="mobile-nav">{links.map((link) => <NavLink onClick={() => setOpen(false)} key={`${link.label}-${link.to}`} to={link.to}>{link.label}</NavLink>)}<NavLink to={account ? '/account' : '/login'}>Account</NavLink><NavLink to="/wishlist">Wishlist ({wishlistCount})</NavLink><NavLink to="/cart">Bag ({cartCount})</NavLink></nav>}</header>;
 }
