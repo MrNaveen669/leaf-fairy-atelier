@@ -15,7 +15,10 @@ import payments from './routes/payments.js';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 
 const app = express(); const PORT = process.env.PORT || 5000;
-app.use(cors({ origin: process.env.CLIENT_URL || 'http://localhost:5173' })); app.use(express.json({ limit: '100kb' }));
+const allowedOrigins=(process.env.CLIENT_URLS||process.env.CLIENT_URL||'http://localhost:5173,http://localhost:5174').split(',').map(value=>value.trim()).filter(Boolean);
+app.use(cors({origin(origin,callback){if(!origin||allowedOrigins.includes(origin))return callback(null,true);callback(new Error('Origin not allowed by CORS'))}}));
+app.use('/api/admin/media/upload', express.raw({ type:['image/jpeg','image/png','image/webp'], limit:'8mb' }));
+app.use(express.json({ limit: '100kb' }));
 app.get('/api/health', (req, res) => res.json({ ok: true }));
 app.use('/api/collections', collections); app.use('/api/products', products); app.use('/api/projects', projects); app.use('/api/testimonials', testimonials); app.use('/api/enquiries', enquiries); app.use('/api/commerce', commerce); app.use('/api/payments', payments); app.use('/api/admin', admin);
 if (process.env.NODE_ENV === 'production') { const __dirname = path.dirname(fileURLToPath(import.meta.url)); const clientDist = path.resolve(__dirname, '../client/dist'); app.use(express.static(clientDist)); app.get('*', (req, res) => res.sendFile(path.join(clientDist, 'index.html'))); } else app.use(notFound);
