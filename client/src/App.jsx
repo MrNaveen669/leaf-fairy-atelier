@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import Home from './pages/Home.jsx';
 import CollectionPage from './pages/CollectionPage.jsx';
 import ContactPage from './pages/ContactPage.jsx';
+import ProductPage from './pages/ProductPage.jsx';
 import ShopPage from './pages/ShopPage.jsx';
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
       <Route path="/" element={<Home />} />
       <Route path="/shop" element={<ShopPage />} />
       <Route path="/collections/:slug" element={<CollectionPage />} />
+      <Route path="/products/:id" element={<ProductPage />} />
       <Route path="/contact" element={<ContactPage />} />
       <Route
         path="*"

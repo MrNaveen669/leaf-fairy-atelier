@@ -1,0 +1,313 @@
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ArrowLeft,
+  ChevronDown,
+  Maximize2,
+  MessageCircle,
+  Minus,
+  Plus,
+  RotateCcw,
+  Sparkles,
+  Truck,
+  X,
+} from 'lucide-react';
+import { Link, useParams } from 'react-router-dom';
+import ProductCard from '../components/ProductCard.jsx';
+import SiteFooter from '../components/SiteFooter.jsx';
+import SiteHeader from '../components/SiteHeader.jsx';
+import { api } from '../api/client.js';
+import { getCatalogProductFallback, getCollectionPresentation } from '../data/catalogContent.js';
+import { whatsappLink } from '../lib/contact.js';
+
+function hasText(value) {
+  return typeof value === 'string' && value.trim().length > 0;
+}
+
+function PdpState({ eyebrow, title, body, action }) {
+  return (
+    <section className="pdp-state" aria-live="polite">
+      <p className="eyebrow">{eyebrow}</p>
+      <h1>{title}</h1>
+      {body && <p>{body}</p>}
+      {action}
+    </section>
+  );
+}
+
+function ProductGallery({ product }) {
+  const fallbackImage = getCatalogProductFallback(product);
+  const [imageSource, setImageSource] = useState(product.image || fallbackImage);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const expandButtonRef = useRef(null);
+  const closeButtonRef = useRef(null);
+
+  useEffect(() => {
+    setImageSource(product.image || fallbackImage);
+    setIsExpanded(false);
+  }, [product._id, product.image, fallbackImage]);
+
+  useEffect(() => {
+    if (!isExpanded) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusFrame = window.requestAnimationFrame(() => closeButtonRef.current?.focus());
+
+    const keepFocusInLightbox = (event) => {
+      if (event.key === 'Escape') {
+        setIsExpanded(false);
+        return;
+      }
+
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        closeButtonRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', keepFocusInLightbox);
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener('keydown', keepFocusInLightbox);
+      document.body.style.overflow = previousOverflow;
+      expandButtonRef.current?.focus();
+    };
+  }, [isExpanded]);
+
+  const imageAlt = product.alt || product.name;
+
+  return (
+    <>
+      <section className="pdp-gallery" aria-label="Product gallery">
+        <div className="pdp-thumbnails" aria-hidden="true">
+          <div className="pdp-thumbnail is-active"><img src={imageSource} alt="" onError={() => {
+            if (imageSource !== fallbackImage) setImageSource(fallbackImage);
+          }} /></div>
+        </div>
+        <div className="pdp-main-media">
+          <img
+            src={imageSource}
+            alt={imageAlt}
+            loading="eager"
+            onError={() => {
+              if (imageSource !== fallbackImage) setImageSource(fallbackImage);
+            }}
+          />
+          <button ref={expandButtonRef} type="button" className="pdp-image-expand" aria-label={`View ${product.name} image larger`} onClick={() => setIsExpanded(true)}>
+            <Maximize2 size={17} aria-hidden="true" />
+          </button>
+        </div>
+      </section>
+
+      {isExpanded && (
+        <div className="pdp-lightbox" role="dialog" aria-modal="true" aria-label={`${product.name} enlarged image`} onClick={() => setIsExpanded(false)}>
+          <div className="pdp-lightbox-content" onClick={(event) => event.stopPropagation()}>
+            <button ref={closeButtonRef} type="button" className="pdp-lightbox-close" aria-label="Close enlarged image" onClick={() => setIsExpanded(false)}>
+              <X size={19} aria-hidden="true" />
+            </button>
+            <img src={imageSource} alt={imageAlt} />
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
+
+function QuantityControl({ quantity, setQuantity }) {
+  return (
+    <div className="pdp-quantity" aria-label="Quantity">
+      <span>Quantity</span>
+      <div>
+        <button type="button" aria-label="Decrease quantity" onClick={() => setQuantity((value) => Math.max(1, value - 1))} disabled={quantity === 1}>
+          <Minus size={14} aria-hidden="true" />
+        </button>
+        <output aria-live="polite">{quantity}</output>
+        <button type="button" aria-label="Increase quantity" onClick={() => setQuantity((value) => value + 1)}>
+          <Plus size={14} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function RelatedProducts({ title, products }) {
+  if (!products.length) return null;
+
+  return (
+    <section className="pdp-related" aria-labelledby={title.toLowerCase().replaceAll(' ', '-')}>
+      <div className="pdp-section-heading">
+        <p className="eyebrow">From the atelier</p>
+        <h2 id={title.toLowerCase().replaceAll(' ', '-')}>{title}</h2>
+      </div>
+      <div className="catalog-grid">
+        {products.map((product) => (
+          <ProductCard
+            key={product._id || product.name}
+            product={product}
+            collectionLabel={getCollectionPresentation(product.collectionSlug).title}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+export default function ProductPage() {
+  const { id } = useParams();
+  const [product, setProduct] = useState(null);
+  const [catalogue, setCatalogue] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [quantity, setQuantity] = useState(1);
+  const [retryKey, setRetryKey] = useState(0);
+
+  useEffect(() => {
+    let active = true;
+
+    async function loadProduct() {
+      setLoading(true);
+      setError('');
+      setProduct(null);
+      setCatalogue([]);
+      setQuantity(1);
+
+      const [productResult, catalogueResult] = await Promise.allSettled([
+        api.get(`/products/${id}`),
+        api.get('/products'),
+      ]);
+
+      if (!active) return;
+
+      if (productResult.status === 'fulfilled') {
+        setProduct(productResult.value);
+        if (catalogueResult.status === 'fulfilled' && Array.isArray(catalogueResult.value)) {
+          setCatalogue(catalogueResult.value);
+        }
+      } else {
+        setError(productResult.reason?.message || 'Request failed');
+      }
+
+      setLoading(false);
+    }
+
+    loadProduct();
+    return () => { active = false; };
+  }, [id, retryKey]);
+
+  const related = useMemo(() => {
+    if (!product) return { sameCollection: [], otherProducts: [] };
+
+    const withoutCurrent = catalogue.filter((item) => item._id !== product._id);
+    return {
+      sameCollection: withoutCurrent.filter((item) => item.collectionSlug === product.collectionSlug).slice(0, 4),
+      otherProducts: withoutCurrent.filter((item) => item.collectionSlug !== product.collectionSlug).slice(0, 4),
+    };
+  }, [catalogue, product]);
+
+  const notFound = error === 'Product not found';
+  const collection = product && getCollectionPresentation(product.collectionSlug);
+  const enquiryMessage = product
+    ? `Hello Leaf Fairy, I would like to enquire about ${product.name}${quantity > 1 ? ` (${quantity} pieces)` : ''}.`
+    : '';
+
+  return (
+    <div className="pdp-page">
+      <SiteHeader />
+      <main>
+        {loading ? (
+          <PdpState
+            eyebrow="Leaf Fairy Atelier"
+            title="Preparing the piece."
+            body="A considered view is on its way."
+            action={<span className="catalog-loader" aria-label="Loading" />}
+          />
+        ) : error || !product ? (
+          <PdpState
+            eyebrow={notFound ? 'Product not found' : 'Product unavailable'}
+            title={notFound ? 'This piece is no longer available.' : 'We couldn’t load this piece.'}
+            body={notFound ? 'Explore the current Leaf Fairy collection.' : 'Please try again from the collection.'}
+            action={notFound ? (
+              <Link to="/shop" className="catalog-action">Browse all pieces</Link>
+            ) : (
+              <button type="button" className="catalog-action" onClick={() => setRetryKey((value) => value + 1)}><RotateCcw size={14} aria-hidden="true" /> Try again</button>
+            )}
+          />
+        ) : (
+          <>
+            <section className="pdp-hero">
+              <div className="pdp-gallery-column">
+                <Link to="/shop" className="pdp-back-link"><ArrowLeft size={15} aria-hidden="true" /> Back to the collection</Link>
+                <ProductGallery product={product} />
+              </div>
+
+              <aside className="pdp-information" aria-labelledby="product-title">
+                <p className="eyebrow">{collection.title}</p>
+                <h1 id="product-title">{product.name}</h1>
+                {hasText(product.description) && <p className="pdp-description">{product.description}</p>}
+                {hasText(product.priceRange) && <p className="pdp-price">{product.priceRange}</p>}
+
+                <div className="pdp-enquiry-note">
+                  <MessageCircle size={17} aria-hidden="true" />
+                  <p>For pricing, delivery and installation enquiries, speak with the atelier.</p>
+                </div>
+
+                <QuantityControl quantity={quantity} setQuantity={setQuantity} />
+                <a className="pdp-primary-action" href={whatsappLink(enquiryMessage)} target="_blank" rel="noreferrer">
+                  <MessageCircle size={16} aria-hidden="true" /> Enquire about this piece
+                </a>
+                <p className="pdp-cta-note">Cart and checkout are being prepared for a future release.</p>
+
+                {hasText(product.description) && (
+                  <details className="pdp-details" open>
+                    <summary>Details <ChevronDown size={17} aria-hidden="true" /></summary>
+                    <p>{product.description}</p>
+                  </details>
+                )}
+              </aside>
+            </section>
+
+            <section className="pdp-benefits" aria-label="Atelier services">
+              <div><Truck size={19} aria-hidden="true" /><p><strong>Pan-India delivery</strong><span>For considered interiors across India.</span></p></div>
+              <div><Sparkles size={19} aria-hidden="true" /><p><strong>White-glove installation</strong><span>Available through the Leaf Fairy atelier.</span></p></div>
+              <div><MessageCircle size={19} aria-hidden="true" /><p><strong>Private consultations</strong><span>Guidance for residential and project spaces.</span></p></div>
+            </section>
+
+            <section className="pdp-bespoke">
+              <div>
+                <p className="eyebrow">Bespoke by Leaf Fairy</p>
+                <h2>Find the right scale for your space.</h2>
+                <p>Private botanical styling consultations for residences, hospitality and commercial interiors.</p>
+                <Link to="/contact" className="pdp-outline-action">Book a consultation</Link>
+              </div>
+              <p className="pdp-bespoke-note">Share your scale, setting and styling needs with the atelier.</p>
+            </section>
+
+            <section className="pdp-craft">
+              <div className="pdp-craft-copy">
+                <p className="eyebrow">Leaf Fairy Atelier</p>
+                <h2>Crafted for lasting beauty</h2>
+                <p>Artificial botanicals selected to bring a composed, enduring presence to considered interiors.</p>
+              </div>
+              <img src="/images/hero/hero-main.png" alt="Leaf Fairy botanical styling in a warm interior" loading="lazy" />
+            </section>
+
+            <section className="pdp-space">
+              <div className="pdp-section-heading">
+                <p className="eyebrow">In situ</p>
+                <h2>See it in your space</h2>
+              </div>
+              <div className="pdp-space-image">
+                <img src="/images/spaces/living-room.png" alt="Living room styled with artificial botanicals" loading="lazy" />
+                <Link to="/contact">Plan a styling consultation</Link>
+              </div>
+            </section>
+
+            <RelatedProducts title="Complete the Look" products={related.sameCollection} />
+            <RelatedProducts title="You may also like" products={related.otherProducts} />
+          </>
+        )}
+      </main>
+      <SiteFooter />
+    </div>
+  );
+}

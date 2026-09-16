@@ -26,7 +26,7 @@ These documents override stale README assumptions.
 - Backend: Node.js with Express 4 and ESM.
 - Database/ODM: MongoDB with Mongoose.
 - Validation: Zod for enquiry requests.
-- Pages/routes: `/`, `/collections/:slug`, `/contact`, and a 404 fallback.
+- Pages/routes: `/`, `/shop`, `/collections/:slug`, `/products/:id`, `/contact`, and a 404 fallback.
 - API: `GET /api/health`; collection list/detail; product list/detail; projects list; testimonials list; validated `POST /api/enquiries`.
 - Current data is catalogue/enquiry-led; `priceRange` is display-only.
 
@@ -59,7 +59,7 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 - Header/navigation: PARTIAL — announcement bar, responsive sticky shell, collection/contact links, utility placeholders, and accessible mobile drawer exist; full commerce navigation is deferred.
 - Homepage: ALIGNED — arched category cards, best sellers, statement olive editorial, shop by space, bespoke/brand row, contact section. Approved homepage structure implemented.
 - PLP/catalog: ALIGNED — editorial all-shop and collection listings, responsive image-first grid, category filtering, supported sort choices, and loading/empty/error states.
-- PDP: MISSING.
+- PDP: ALIGNED — API-backed product page with an editorial gallery, truthful product fields, enquiry-led quantity control, service/bespoke sections, and catalogue-based related products.
 - Search: MISSING.
 - Wishlist: MISSING.
 - Cart: MISSING.
@@ -99,10 +99,11 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 `Phase 1.1 — Frontend Foundation & Global Luxury Shell — DONE`
 `Phase 1.2 — Luxury Homepage — DONE`
 `Phase 1.3 — Shop / PLP / Collections — DONE`
+`Phase 1.4 — Product Detail Page — DONE`
 
 ## Next Milestone
 
-`Phase 1.4 — Product Detail Page`
+`Phase 1.5 — Wishlist + Cart`
 
 ## Phase 1.1 Notes
 
@@ -126,8 +127,15 @@ The TRD and backend schema plan a future React/Vite/TypeScript frontend, Node ba
 
 - Added `/shop` with an editorial all-products listing, local listing art, category filter, and only data-supported Newest/Name A–Z sort choices.
 - Refined collection listings with compact responsive product cards, collection navigation, product counts, and loading/empty/error states.
-- Product cards retain the existing WhatsApp enquiry flow; PDP click-through remains intentionally deferred until Phase 1.4.
+- Product cards retain the existing WhatsApp enquiry flow and link product media/titles to `/products/:id`.
 - Local category media is used as a graceful image fallback while the API’s product-image URLs remain remote.
+
+## Phase 1.4 Notes
+
+- `/products/:id` uses `GET /api/products/:id` with loading, unavailable, and not-found states; a local category image is used if a product image fails.
+- Current product data supports only `_id`, collection, name, description, display-only `priceRange`, image, and alt text. The gallery is therefore one real image with an accessible enlarged-image view; no video, extra media, SKU, ratings, structured variants, inventory, numeric price, tax, or delivery lookup exists.
+- Quantity only makes the existing WhatsApp enquiry more specific; cart, wishlist, and checkout remain deferred to Phase 1.5.
+- Related rows reuse `GET /api/products`, exclude the active product, and prioritize its collection before other catalogue pieces.
 
 ## Security Note
 

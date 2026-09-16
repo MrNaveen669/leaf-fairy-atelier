@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, MessageCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { getCatalogProductFallback } from '../data/catalogContent.js';
 import { whatsappLink } from '../lib/contact.js';
 
@@ -9,6 +10,7 @@ function hasPrice(product) {
 
 export default function ProductCard({ product, collectionLabel }) {
   const fallbackImage = getCatalogProductFallback(product);
+  const productPath = product._id ? `/products/${product._id}` : null;
   const [imageSource, setImageSource] = useState(product.image || fallbackImage);
 
   useEffect(() => {
@@ -18,18 +20,31 @@ export default function ProductCard({ product, collectionLabel }) {
   return (
     <article className="catalog-product-card">
       <div className="catalog-product-media">
-        <img
-          src={imageSource}
-          alt={product.alt || product.name}
-          loading="lazy"
-          onError={() => {
-            if (imageSource !== fallbackImage) setImageSource(fallbackImage);
-          }}
-        />
+        {productPath ? (
+          <Link className="catalog-product-media-link" to={productPath} aria-label={`View ${product.name}`}>
+            <img
+              src={imageSource}
+              alt={product.alt || product.name}
+              loading="lazy"
+              onError={() => {
+                if (imageSource !== fallbackImage) setImageSource(fallbackImage);
+              }}
+            />
+          </Link>
+        ) : (
+          <img
+            src={imageSource}
+            alt={product.alt || product.name}
+            loading="lazy"
+            onError={() => {
+              if (imageSource !== fallbackImage) setImageSource(fallbackImage);
+            }}
+          />
+        )}
       </div>
       <div className="catalog-product-copy">
         {collectionLabel && <p className="catalog-product-kicker">{collectionLabel}</p>}
-        <h3>{product.name}</h3>
+        <h3>{productPath ? <Link to={productPath}>{product.name}</Link> : product.name}</h3>
         {hasPrice(product) && <p className="catalog-product-price">{product.priceRange}</p>}
         <a
           className="catalog-enquiry-link"
